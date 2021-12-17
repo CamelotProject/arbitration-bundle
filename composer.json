@@ -1,0 +1,35 @@
+{
+    "name": "camelot/arbitration",
+    "description": "Middleware library & bundle for Intervention Image",
+    "license": "MIT",
+    "type": "symfony-bundle",
+    "minimum-stability": "stable",
+    "require": {
+        "intervention/image": "^2.7"
+    },
+    "require-dev": {
+        "camelot/coding-style": "^3.0",
+        "friendsofphp/php-cs-fixer": "^3.4",
+        "guzzlehttp/psr7": "^2.1",
+        "mockery/mockery": "^1.4",
+        "phpunit/phpunit": "^9.5",
+        "psr/cache": "^3.0",
+        "psr/simple-cache": "^3.0",
+        "spatie/temporary-directory": "^2.0",
+        "symfony/cache": "^6.0",
+        "symfony/framework-bundle": "^6.0",
+        "symfony/messenger": "^6.0",
+        "symfony/yaml": "^6.0",
+        "twig/twig": "^3.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Camelot\\Arbitration\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Camelot\\Arbitration\\Tests\\": "tests/"
+        }
+    }
+}
