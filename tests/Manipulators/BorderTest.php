@@ -10,6 +10,9 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @covers \Camelot\Intervention\Manipulators\BaseManipulator
+ * @covers \Camelot\Intervention\Manipulators\Border
+ *
  * @internal
  */
 final class BorderTest extends TestCase

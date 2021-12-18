@@ -10,6 +10,9 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @covers \Camelot\Intervention\Manipulators\BaseManipulator
+ * @covers \Camelot\Intervention\Manipulators\Pixelate
+ *
  * @internal
  */
 final class PixelateTest extends TestCase

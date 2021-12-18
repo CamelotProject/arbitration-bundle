@@ -10,6 +10,9 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @covers \Camelot\Intervention\Manipulators\BaseManipulator
+ * @covers \Camelot\Intervention\Manipulators\Flip
+ *
  * @internal
  */
 final class FlipTest extends TestCase
