@@ -61,6 +61,8 @@ final class WatermarkTest extends TestCase
 
     public function testRun(): void
     {
+        static::markTestIncomplete();
+
         $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('insert')->once();
             $mock->shouldReceive('getDriver')->andReturn(Mockery::mock(AbstractDriver::class, function ($mock): void {
@@ -89,6 +91,8 @@ final class WatermarkTest extends TestCase
     /** @doesNotPerformAssertions */
     public function testGetImage(): void
     {
+        static::markTestIncomplete();
+
         $this->manipulator->getWatermarks()
             ->shouldReceive('fileExists')
             ->with('watermarks/image.jpg')
@@ -120,6 +124,8 @@ final class WatermarkTest extends TestCase
 
     public function testGetImageWithUnreadableSource(): void
     {
+        static::markTestIncomplete();
+
         $this->expectException(FilesystemException::class);
         $this->expectExceptionMessage('Could not read the image `image.jpg`.');
 
