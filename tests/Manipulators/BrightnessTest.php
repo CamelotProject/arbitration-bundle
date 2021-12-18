@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Camelot\Arbitration\Tests\Manipulators;
 
 use Camelot\Arbitration\Manipulators\Brightness;
+use Intervention\Image\Image;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -27,19 +28,16 @@ final class BrightnessTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf('League\Glide\Manipulators\Brightness', $this->manipulator);
+        static::assertInstanceOf(Brightness::class, $this->manipulator);
     }
 
     public function testRun(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('brightness')->with('50')->once();
         });
 
-        static::assertInstanceOf(
-            'Intervention\Image\Image',
-            $this->manipulator->setParams(['bri' => 50])->run($image)
-        );
+        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['bri' => 50])->run($image));
     }
 
     public function testGetPixelate(): void

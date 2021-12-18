@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Camelot\Arbitration\Tests\Manipulators;
 
 use Camelot\Arbitration\Manipulators\Background;
+use Intervention\Image\AbstractDriver;
+use Intervention\Image\Image;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -20,16 +22,16 @@ final class BackgroundTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf('League\Glide\Manipulators\Background', new Background());
+        static::assertInstanceOf(Background::class, new Background());
     }
 
     public function testRun(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('width')->andReturn(100)->once();
             $mock->shouldReceive('height')->andReturn(100)->once();
-            $mock->shouldReceive('getDriver')->andReturn(Mockery::mock('Intervention\Image\AbstractDriver', function ($mock): void {
-                $mock->shouldReceive('newImage')->with(100, 100, 'rgba(0, 0, 0, 1)')->andReturn(Mockery::mock('Intervention\Image\Image', function ($mock): void {
+            $mock->shouldReceive('getDriver')->andReturn(Mockery::mock(AbstractDriver::class, function ($mock): void {
+                $mock->shouldReceive('newImage')->with(100, 100, 'rgba(0, 0, 0, 1)')->andReturn(Mockery::mock(Image::class, function ($mock): void {
                     $mock->shouldReceive('insert')->andReturn($mock)->once();
                 }))->once();
             }))->once();
@@ -37,7 +39,7 @@ final class BackgroundTest extends TestCase
 
         $border = new Background();
 
-        static::assertInstanceOf('Intervention\Image\Image', $border->run($image));
-        static::assertInstanceOf('Intervention\Image\Image', $border->setParams(['bg' => 'black'])->run($image));
+        static::assertInstanceOf(Image::class, $border->run($image));
+        static::assertInstanceOf(Image::class, $border->setParams(['bg' => 'black'])->run($image));
     }
 }

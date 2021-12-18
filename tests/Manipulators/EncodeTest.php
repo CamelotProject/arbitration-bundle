@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Camelot\Arbitration\Tests\Manipulators;
 
 use Camelot\Arbitration\Manipulators\Encode;
+use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -46,7 +47,7 @@ final class EncodeTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf('League\Glide\Manipulators\Encode', $this->manipulator);
+        static::assertInstanceOf(Encode::class, $this->manipulator);
     }
 
     public function testRun(): void
@@ -93,7 +94,7 @@ final class EncodeTest extends TestCase
 
     public function testGetFormat(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('mime')->andReturn('image/jpeg')->once();
             $mock->shouldReceive('mime')->andReturn('image/png')->once();
             $mock->shouldReceive('mime')->andReturn('image/gif')->once();

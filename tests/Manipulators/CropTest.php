@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Camelot\Arbitration\Tests\Manipulators;
 
 use Camelot\Arbitration\Manipulators\Crop;
+use Intervention\Image\Image;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +19,7 @@ final class CropTest extends TestCase
     protected function setUp(): void
     {
         $this->manipulator = new Crop();
-        $this->image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $this->image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('width')->andReturn(100);
             $mock->shouldReceive('height')->andReturn(100);
         });
@@ -31,17 +32,14 @@ final class CropTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf('League\Glide\Manipulators\Crop', $this->manipulator);
+        static::assertInstanceOf(Crop::class, $this->manipulator);
     }
 
     public function testRun(): void
     {
         $this->image->shouldReceive('crop')->with(100, 100, 0, 0)->once();
 
-        static::assertInstanceOf(
-            'Intervention\Image\Image',
-            $this->manipulator->setParams(['crop' => '100,100,0,0'])->run($this->image)
-        );
+        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['crop' => '100,100,0,0'])->run($this->image));
     }
 
     public function testGetCoordinates(): void
