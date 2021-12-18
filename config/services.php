@@ -3,6 +3,9 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Camelot\Arbitration\Manipulators;
+use Camelot\Arbitration\Api\Intervene;
+use Camelot\Arbitration\Api\InterveneInterface;
+use Intervention\Image\ImageManager;
 
 return function(ContainerConfigurator $configurator) {
     $services = $configurator->services()
@@ -53,4 +56,12 @@ return function(ContainerConfigurator $configurator) {
     $services->set(Manipulators\Encode::class)
         ->tag('camelot.intervention.manipulator', ['priority' => 75])
     ;
+
+    $services->set(ImageManager::class);
+
+    $services->set(Intervene::class)
+        ->arg('$manipulators', tagged_iterator('camelot.intervention.manipulator'))
+    ;
+
+    $services->alias(InterveneInterface::class, Intervene::class);
 };

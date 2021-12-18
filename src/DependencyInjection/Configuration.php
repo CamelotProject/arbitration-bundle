@@ -16,6 +16,10 @@ final class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
+                ->enumNode('driver')
+                    ->values(['gd', 'imagick'])
+                    ->defaultValue('gd')
+                ->end()
             ->end()
         ;
 
