@@ -10,6 +10,8 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @covers \Camelot\Intervention\Manipulators\Helpers\Dimension
+ *
  * @internal
  */
 final class DimensionTest extends TestCase

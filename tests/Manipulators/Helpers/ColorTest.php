@@ -8,6 +8,8 @@ use Camelot\Arbitration\Manipulators\Helpers\Color;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @covers \Camelot\Intervention\Manipulators\Helpers\Color
+ *
  * @internal
  */
 final class ColorTest extends TestCase

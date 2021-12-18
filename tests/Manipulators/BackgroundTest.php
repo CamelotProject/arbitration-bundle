@@ -11,6 +11,9 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @covers \Camelot\Intervention\Manipulators\Background
+ * @covers \Camelot\Intervention\Manipulators\BaseManipulator
+ *
  * @internal
  */
 final class BackgroundTest extends TestCase

@@ -11,6 +11,9 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @covers \Camelot\Intervention\Manipulators\BaseManipulator
+ * @covers \Camelot\Intervention\Manipulators\Encode
+ *
  * @internal
  */
 final class EncodeTest extends TestCase

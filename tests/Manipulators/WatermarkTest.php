@@ -13,6 +13,9 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @covers \Camelot\Intervention\Manipulators\BaseManipulator
+ * @covers \Camelot\Intervention\Manipulators\Watermark
+ *
  * @internal
  */
 final class WatermarkTest extends TestCase

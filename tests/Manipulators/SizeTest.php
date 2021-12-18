@@ -11,6 +11,9 @@ use Mockery\Matcher\Closure;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @covers \Camelot\Intervention\Manipulators\BaseManipulator
+ * @covers \Camelot\Intervention\Manipulators\Size
+ *
  * @internal
  */
 final class SizeTest extends TestCase

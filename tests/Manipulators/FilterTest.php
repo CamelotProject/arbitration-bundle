@@ -10,6 +10,9 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @covers \Camelot\Intervention\Manipulators\BaseManipulator
+ * @covers \Camelot\Intervention\Manipulators\Filter
+ *
  * @internal
  */
 final class FilterTest extends TestCase
