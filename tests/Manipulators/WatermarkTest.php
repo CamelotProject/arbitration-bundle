@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Camelot\Arbitration\Tests\Manipulators;
 
 use Camelot\Arbitration\Manipulators\Watermark;
@@ -7,62 +9,63 @@ use League\Glide\Filesystem\FilesystemException;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
-class WatermarkTest extends TestCase
+/**
+ * @internal
+ */
+final class WatermarkTest extends TestCase
 {
-    private $manipulator;
+    private Watermark $manipulator;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
-        $this->manipulator = new Watermark(
-            Mockery::mock('League\Flysystem\FilesystemOperator')
-        );
+        $this->manipulator = new Watermark(Mockery::mock(FilesystemOperator::class));
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
     }
 
-    public function testCreateInstance()
+    public function testCreateInstance(): void
     {
-        $this->assertInstanceOf('League\Glide\Manipulators\Watermark', $this->manipulator);
+        static::assertInstanceOf('League\Glide\Manipulators\Watermark', $this->manipulator);
     }
 
-    public function testSetWatermarks()
+    public function testSetWatermarks(): void
     {
         $this->manipulator->setWatermarks(Mockery::mock('League\Flysystem\FilesystemOperator'));
-        $this->assertInstanceOf('League\Flysystem\FilesystemOperator', $this->manipulator->getWatermarks());
+        static::assertInstanceOf('League\Flysystem\FilesystemOperator', $this->manipulator->getWatermarks());
     }
 
-    public function testGetWatermarks()
+    public function testGetWatermarks(): void
     {
-        $this->assertInstanceOf('League\Flysystem\FilesystemOperator', $this->manipulator->getWatermarks());
+        static::assertInstanceOf('League\Flysystem\FilesystemOperator', $this->manipulator->getWatermarks());
     }
 
-    public function testSetWatermarksPathPrefix()
+    public function testSetWatermarksPathPrefix(): void
     {
         $this->manipulator->setWatermarksPathPrefix('watermarks/');
-        $this->assertEquals('watermarks', $this->manipulator->getWatermarksPathPrefix());
+        static::assertSame('watermarks', $this->manipulator->getWatermarksPathPrefix());
     }
 
-    public function testGetWatermarksPathPrefix()
+    public function testGetWatermarksPathPrefix(): void
     {
-        $this->assertEquals('', $this->manipulator->getWatermarksPathPrefix());
+        static::assertSame('', $this->manipulator->getWatermarksPathPrefix());
     }
 
-    public function testRun()
+    public function testRun(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock) {
+        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
             $mock->shouldReceive('insert')->once();
-            $mock->shouldReceive('getDriver')->andReturn(Mockery::mock('Intervention\Image\AbstractDriver', function ($mock) {
-                $mock->shouldReceive('init')->with('content')->andReturn(Mockery::mock('Intervention\Image\Image', function ($mock) {
+            $mock->shouldReceive('getDriver')->andReturn(Mockery::mock('Intervention\Image\AbstractDriver', function ($mock): void {
+                $mock->shouldReceive('init')->with('content')->andReturn(Mockery::mock('Intervention\Image\Image', function ($mock): void {
                     $mock->shouldReceive('width')->andReturn(0)->once();
                     $mock->shouldReceive('resize')->once();
                 }))->once();
             }))->once();
         });
 
-        $this->manipulator->setWatermarks(Mockery::mock('League\Flysystem\FilesystemOperator', function ($watermarks) {
+        $this->manipulator->setWatermarks(Mockery::mock('League\Flysystem\FilesystemOperator', function ($watermarks): void {
             $watermarks->shouldReceive('fileExists')->with('image.jpg')->andReturn(true)->once();
             $watermarks->shouldReceive('read')->with('image.jpg')->andReturn('content')->once();
         }));
@@ -74,149 +77,151 @@ class WatermarkTest extends TestCase
             'markpad' => '10',
         ]);
 
-        $this->assertInstanceOf(
+        static::assertInstanceOf(
             'Intervention\Image\Image',
             $this->manipulator->run($image)
         );
     }
 
-    /**
-     * @doesNotPerformAssertions
-     */
-    public function testGetImage()
+    /** @doesNotPerformAssertions */
+    public function testGetImage(): void
     {
         $this->manipulator->getWatermarks()
             ->shouldReceive('fileExists')
-                ->with('watermarks/image.jpg')
-                ->andReturn(true)
-                ->once()
+            ->with('watermarks/image.jpg')
+            ->andReturn(true)
+            ->once()
             ->shouldReceive('read')
-                ->with('watermarks/image.jpg')
-                ->andReturn('content')
-                ->once();
+            ->with('watermarks/image.jpg')
+            ->andReturn('content')
+            ->once()
+        ;
 
         $this->manipulator->setWatermarksPathPrefix('watermarks');
 
         $driver = Mockery::mock('Intervention\Image\AbstractDriver');
         $driver->shouldReceive('init')
-               ->with('content')
-               ->andReturn(Mockery::mock('Intervention\Image\Image'))
-               ->once();
+            ->with('content')
+            ->andReturn(Mockery::mock('Intervention\Image\Image'))
+            ->once()
+        ;
 
         $image = Mockery::mock('Intervention\Image\Image');
         $image->shouldReceive('getDriver')
-              ->andReturn($driver)
-              ->once();
+            ->andReturn($driver)
+            ->once()
+        ;
 
         $this->manipulator->setParams(['mark' => 'image.jpg'])->getImage($image);
     }
 
-    public function testGetImageWithUnreadableSource()
+    public function testGetImageWithUnreadableSource(): void
     {
         $this->expectException(FilesystemException::class);
         $this->expectExceptionMessage('Could not read the image `image.jpg`.');
 
         $this->manipulator->getWatermarks()
             ->shouldReceive('fileExists')
-                ->with('image.jpg')
-                ->andReturn(true)
-                ->once()
+            ->with('image.jpg')
+            ->andReturn(true)
+            ->once()
             ->shouldReceive('read')
-                ->with('image.jpg')
-                ->andThrow('League\Flysystem\UnableToReadFile')
-                ->once();
+            ->with('image.jpg')
+            ->andThrow('League\Flysystem\UnableToReadFile')
+            ->once()
+        ;
 
         $image = Mockery::mock('Intervention\Image\Image');
 
         $this->manipulator->setParams(['mark' => 'image.jpg'])->getImage($image);
     }
 
-    public function testGetImageWithoutMarkParam()
+    public function testGetImageWithoutMarkParam(): void
     {
         $image = Mockery::mock('Intervention\Image\Image');
 
-        $this->assertNull($this->manipulator->getImage($image));
+        static::assertNull($this->manipulator->getImage($image));
     }
 
-    public function testGetImageWithEmptyMarkParam()
+    public function testGetImageWithEmptyMarkParam(): void
     {
         $image = Mockery::mock('Intervention\Image\Image');
 
-        $this->assertNull($this->manipulator->setParams(['mark' => ''])->getImage($image));
+        static::assertNull($this->manipulator->setParams(['mark' => ''])->getImage($image));
     }
 
-    public function testGetImageWithoutWatermarksFilesystem()
+    public function testGetImageWithoutWatermarksFilesystem(): void
     {
         $this->manipulator->setWatermarks(null);
 
         $image = Mockery::mock('Intervention\Image\Image');
 
-        $this->assertNull($this->manipulator->setParams(['mark' => 'image.jpg'])->getImage($image));
+        static::assertNull($this->manipulator->setParams(['mark' => 'image.jpg'])->getImage($image));
     }
 
-    public function testGetDimension()
+    public function testGetDimension(): void
     {
         $image = Mockery::mock('Intervention\Image\Image');
         $image->shouldReceive('width')->andReturn(2000);
         $image->shouldReceive('height')->andReturn(1000);
 
-        $this->assertSame(300.0, $this->manipulator->setParams(['w' => '300'])->getDimension($image, 'w'));
-        $this->assertSame(300.0, $this->manipulator->setParams(['w' => 300])->getDimension($image, 'w'));
-        $this->assertSame(1000.0, $this->manipulator->setParams(['w' => '50w'])->getDimension($image, 'w'));
-        $this->assertSame(500.0, $this->manipulator->setParams(['w' => '50h'])->getDimension($image, 'w'));
-        $this->assertSame(null, $this->manipulator->setParams(['w' => '101h'])->getDimension($image, 'w'));
-        $this->assertSame(null, $this->manipulator->setParams(['w' => -1])->getDimension($image, 'w'));
-        $this->assertSame(null, $this->manipulator->setParams(['w' => ''])->getDimension($image, 'w'));
+        static::assertSame(300.0, $this->manipulator->setParams(['w' => '300'])->getDimension($image, 'w'));
+        static::assertSame(300.0, $this->manipulator->setParams(['w' => 300])->getDimension($image, 'w'));
+        static::assertSame(1000.0, $this->manipulator->setParams(['w' => '50w'])->getDimension($image, 'w'));
+        static::assertSame(500.0, $this->manipulator->setParams(['w' => '50h'])->getDimension($image, 'w'));
+        static::assertNull($this->manipulator->setParams(['w' => '101h'])->getDimension($image, 'w'));
+        static::assertNull($this->manipulator->setParams(['w' => -1])->getDimension($image, 'w'));
+        static::assertNull($this->manipulator->setParams(['w' => ''])->getDimension($image, 'w'));
     }
 
-    public function testGetDpr()
+    public function testGetDpr(): void
     {
-        $this->assertSame(1.0, $this->manipulator->setParams(['dpr' => 'invalid'])->getDpr());
-        $this->assertSame(1.0, $this->manipulator->setParams(['dpr' => '-1'])->getDpr());
-        $this->assertSame(1.0, $this->manipulator->setParams(['dpr' => '9'])->getDpr());
-        $this->assertSame(2.0, $this->manipulator->setParams(['dpr' => '2'])->getDpr());
+        static::assertSame(1.0, $this->manipulator->setParams(['dpr' => 'invalid'])->getDpr());
+        static::assertSame(1.0, $this->manipulator->setParams(['dpr' => '-1'])->getDpr());
+        static::assertSame(1.0, $this->manipulator->setParams(['dpr' => '9'])->getDpr());
+        static::assertSame(2.0, $this->manipulator->setParams(['dpr' => '2'])->getDpr());
     }
 
-    public function testGetFit()
+    public function testGetFit(): void
     {
-        $this->assertSame('contain', $this->manipulator->setParams(['markfit' => 'contain'])->getFit());
-        $this->assertSame('max', $this->manipulator->setParams(['markfit' => 'max'])->getFit());
-        $this->assertSame('stretch', $this->manipulator->setParams(['markfit' => 'stretch'])->getFit());
-        $this->assertSame('crop', $this->manipulator->setParams(['markfit' => 'crop'])->getFit());
-        $this->assertSame('crop-top-left', $this->manipulator->setParams(['markfit' => 'crop-top-left'])->getFit());
-        $this->assertSame('crop-top', $this->manipulator->setParams(['markfit' => 'crop-top'])->getFit());
-        $this->assertSame('crop-top-right', $this->manipulator->setParams(['markfit' => 'crop-top-right'])->getFit());
-        $this->assertSame('crop-left', $this->manipulator->setParams(['markfit' => 'crop-left'])->getFit());
-        $this->assertSame('crop-center', $this->manipulator->setParams(['markfit' => 'crop-center'])->getFit());
-        $this->assertSame('crop-right', $this->manipulator->setParams(['markfit' => 'crop-right'])->getFit());
-        $this->assertSame('crop-bottom-left', $this->manipulator->setParams(['markfit' => 'crop-bottom-left'])->getFit());
-        $this->assertSame('crop-bottom', $this->manipulator->setParams(['markfit' => 'crop-bottom'])->getFit());
-        $this->assertSame('crop-bottom-right', $this->manipulator->setParams(['markfit' => 'crop-bottom-right'])->getFit());
-        $this->assertSame(null, $this->manipulator->setParams(['markfit' => null])->getFit());
-        $this->assertSame(null, $this->manipulator->setParams(['markfit' => 'invalid'])->getFit());
+        static::assertSame('contain', $this->manipulator->setParams(['markfit' => 'contain'])->getFit());
+        static::assertSame('max', $this->manipulator->setParams(['markfit' => 'max'])->getFit());
+        static::assertSame('stretch', $this->manipulator->setParams(['markfit' => 'stretch'])->getFit());
+        static::assertSame('crop', $this->manipulator->setParams(['markfit' => 'crop'])->getFit());
+        static::assertSame('crop-top-left', $this->manipulator->setParams(['markfit' => 'crop-top-left'])->getFit());
+        static::assertSame('crop-top', $this->manipulator->setParams(['markfit' => 'crop-top'])->getFit());
+        static::assertSame('crop-top-right', $this->manipulator->setParams(['markfit' => 'crop-top-right'])->getFit());
+        static::assertSame('crop-left', $this->manipulator->setParams(['markfit' => 'crop-left'])->getFit());
+        static::assertSame('crop-center', $this->manipulator->setParams(['markfit' => 'crop-center'])->getFit());
+        static::assertSame('crop-right', $this->manipulator->setParams(['markfit' => 'crop-right'])->getFit());
+        static::assertSame('crop-bottom-left', $this->manipulator->setParams(['markfit' => 'crop-bottom-left'])->getFit());
+        static::assertSame('crop-bottom', $this->manipulator->setParams(['markfit' => 'crop-bottom'])->getFit());
+        static::assertSame('crop-bottom-right', $this->manipulator->setParams(['markfit' => 'crop-bottom-right'])->getFit());
+        static::assertNull($this->manipulator->setParams(['markfit' => null])->getFit());
+        static::assertNull($this->manipulator->setParams(['markfit' => 'invalid'])->getFit());
     }
 
-    public function testGetPosition()
+    public function testGetPosition(): void
     {
-        $this->assertSame('top-left', $this->manipulator->setParams(['markpos' => 'top-left'])->getPosition());
-        $this->assertSame('top', $this->manipulator->setParams(['markpos' => 'top'])->getPosition());
-        $this->assertSame('top-right', $this->manipulator->setParams(['markpos' => 'top-right'])->getPosition());
-        $this->assertSame('left', $this->manipulator->setParams(['markpos' => 'left'])->getPosition());
-        $this->assertSame('center', $this->manipulator->setParams(['markpos' => 'center'])->getPosition());
-        $this->assertSame('right', $this->manipulator->setParams(['markpos' => 'right'])->getPosition());
-        $this->assertSame('bottom-left', $this->manipulator->setParams(['markpos' => 'bottom-left'])->getPosition());
-        $this->assertSame('bottom', $this->manipulator->setParams(['markpos' => 'bottom'])->getPosition());
-        $this->assertSame('bottom-right', $this->manipulator->setParams(['markpos' => 'bottom-right'])->getPosition());
-        $this->assertSame('bottom-right', $this->manipulator->setParams([])->getPosition());
-        $this->assertSame('bottom-right', $this->manipulator->setParams(['markpos' => 'invalid'])->getPosition());
+        static::assertSame('top-left', $this->manipulator->setParams(['markpos' => 'top-left'])->getPosition());
+        static::assertSame('top', $this->manipulator->setParams(['markpos' => 'top'])->getPosition());
+        static::assertSame('top-right', $this->manipulator->setParams(['markpos' => 'top-right'])->getPosition());
+        static::assertSame('left', $this->manipulator->setParams(['markpos' => 'left'])->getPosition());
+        static::assertSame('center', $this->manipulator->setParams(['markpos' => 'center'])->getPosition());
+        static::assertSame('right', $this->manipulator->setParams(['markpos' => 'right'])->getPosition());
+        static::assertSame('bottom-left', $this->manipulator->setParams(['markpos' => 'bottom-left'])->getPosition());
+        static::assertSame('bottom', $this->manipulator->setParams(['markpos' => 'bottom'])->getPosition());
+        static::assertSame('bottom-right', $this->manipulator->setParams(['markpos' => 'bottom-right'])->getPosition());
+        static::assertSame('bottom-right', $this->manipulator->setParams([])->getPosition());
+        static::assertSame('bottom-right', $this->manipulator->setParams(['markpos' => 'invalid'])->getPosition());
     }
 
-    public function testGetAlpha()
+    public function testGetAlpha(): void
     {
-        $this->assertSame(100, $this->manipulator->setParams(['markalpha' => 'invalid'])->getAlpha());
-        $this->assertSame(100, $this->manipulator->setParams(['markalpha' => 255])->getAlpha());
-        $this->assertSame(100, $this->manipulator->setParams(['markalpha' => -1])->getAlpha());
-        $this->assertSame(65, $this->manipulator->setParams(['markalpha' => '65'])->getAlpha());
-        $this->assertSame(65, $this->manipulator->setParams(['markalpha' => 65])->getAlpha());
+        static::assertSame(100, $this->manipulator->setParams(['markalpha' => 'invalid'])->getAlpha());
+        static::assertSame(100, $this->manipulator->setParams(['markalpha' => 255])->getAlpha());
+        static::assertSame(100, $this->manipulator->setParams(['markalpha' => -1])->getAlpha());
+        static::assertSame(65, $this->manipulator->setParams(['markalpha' => '65'])->getAlpha());
+        static::assertSame(65, $this->manipulator->setParams(['markalpha' => 65])->getAlpha());
     }
 }

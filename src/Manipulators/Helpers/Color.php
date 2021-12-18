@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Camelot\Arbitration\Manipulators\Helpers;
 
+use function array_key_exists;
+
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
  */
@@ -11,50 +13,28 @@ class Color
 {
     /** 3 digit color code expression. */
     public const SHORT_RGB = '/^[0-9a-f]{3}$/i';
-
     /** 4 digit color code expression. */
     public const SHORT_ARGB = '/^[0-9]{1}[0-9a-f]{3}$/i';
-
     /** 6 digit color code expression. */
     public const LONG_RGB = '/^[0-9a-f]{6}$/i';
-
     /** 8 digit color code expression. */
     public const LONG_ARGB = '/^[0-9]{2}[0-9a-f]{6}$/i';
 
-    /**
-     * The red value.
-     *
-     * @var int
-     */
-    protected $red;
-
-    /**
-     * The green value.
-     *
-     * @var int
-     */
-    protected $green;
-
-    /**
-     * The blue value.
-     *
-     * @var int
-     */
-    protected $blue;
-
-    /**
-     * The alpha value.
-     *
-     * @var float|int
-     */
-    protected $alpha;
+    /** The red value. */
+    protected int $red;
+    /** The green value. */
+    protected int $green;
+    /** The blue value. */
+    protected int $blue;
+    /** The alpha value. */
+    protected float|int $alpha;
 
     /**
      * Create color helper instance.
      *
      * @param string $value the color value
      */
-    public function __construct($value)
+    public function __construct(string $value)
     {
         do {
             if ($hex = $this->getHexFromColorName($value)) {
@@ -109,7 +89,7 @@ class Color
      *
      * @return array the RGB values
      */
-    public function parseHex($hex)
+    public function parseHex($hex): array
     {
         return array_map('hexdec', str_split($hex, 2));
     }
@@ -119,7 +99,7 @@ class Color
      *
      * @return string the formatted color
      */
-    public function formatted()
+    public function formatted(): string
     {
         return 'rgba(' . $this->red . ', ' . $this->green . ', ' . $this->blue . ', ' . $this->alpha . ')';
     }
@@ -131,7 +111,7 @@ class Color
      *
      * @return null|string the hex code
      */
-    public function getHexFromColorName($name)
+    public function getHexFromColorName(string $name): ?string
     {
         $colors = [
             'aliceblue' => 'F0F8FF',
@@ -279,8 +259,10 @@ class Color
 
         $name = strtolower($name);
 
-        if (\array_key_exists($name, $colors)) {
+        if (array_key_exists($name, $colors)) {
             return $colors[$name];
         }
+
+        return null;
     }
 }

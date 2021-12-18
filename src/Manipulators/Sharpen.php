@@ -20,7 +20,7 @@ class Sharpen extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function run(Image $image)
+    public function run(Image $image): Image
     {
         $sharpen = $this->getSharpen();
 
@@ -36,14 +36,14 @@ class Sharpen extends BaseManipulator
      *
      * @return null|int the resolved sharpen amount
      */
-    public function getSharpen()
+    public function getSharpen(): ?int
     {
         if (!is_numeric($this->sharp)) {
-            return;
+            return null;
         }
 
         if ($this->sharp < 0 || $this->sharp > 100) {
-            return;
+            return null;
         }
 
         return (int) $this->sharp;

@@ -1,49 +1,54 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Camelot\Arbitration\Tests\Manipulators;
 
 use Camelot\Arbitration\Manipulators\Brightness;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
-class BrightnessTest extends TestCase
+/**
+ * @internal
+ */
+final class BrightnessTest extends TestCase
 {
-    private $manipulator;
+    private Brightness $manipulator;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->manipulator = new Brightness();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
     }
 
-    public function testCreateInstance()
+    public function testCreateInstance(): void
     {
-        $this->assertInstanceOf('League\Glide\Manipulators\Brightness', $this->manipulator);
+        static::assertInstanceOf('League\Glide\Manipulators\Brightness', $this->manipulator);
     }
 
-    public function testRun()
+    public function testRun(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock) {
+        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
             $mock->shouldReceive('brightness')->with('50')->once();
         });
 
-        $this->assertInstanceOf(
+        static::assertInstanceOf(
             'Intervention\Image\Image',
             $this->manipulator->setParams(['bri' => 50])->run($image)
         );
     }
 
-    public function testGetPixelate()
+    public function testGetPixelate(): void
     {
-        $this->assertSame(50, $this->manipulator->setParams(['bri' => '50'])->getBrightness());
-        $this->assertSame(50, $this->manipulator->setParams(['bri' => 50])->getBrightness());
-        $this->assertSame(null, $this->manipulator->setParams(['bri' => null])->getBrightness());
-        $this->assertSame(null, $this->manipulator->setParams(['bri' => '101'])->getBrightness());
-        $this->assertSame(null, $this->manipulator->setParams(['bri' => '-101'])->getBrightness());
-        $this->assertSame(null, $this->manipulator->setParams(['bri' => 'a'])->getBrightness());
+        static::assertSame(50, $this->manipulator->setParams(['bri' => '50'])->getBrightness());
+        static::assertSame(50, $this->manipulator->setParams(['bri' => 50])->getBrightness());
+        static::assertNull($this->manipulator->setParams(['bri' => null])->getBrightness());
+        static::assertNull($this->manipulator->setParams(['bri' => '101'])->getBrightness());
+        static::assertNull($this->manipulator->setParams(['bri' => '-101'])->getBrightness());
+        static::assertNull($this->manipulator->setParams(['bri' => 'a'])->getBrightness());
     }
 }

@@ -20,7 +20,7 @@ class Contrast extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function run(Image $image)
+    public function run(Image $image): Image
     {
         $contrast = $this->getContrast();
 
@@ -36,14 +36,14 @@ class Contrast extends BaseManipulator
      *
      * @return null|int the resolved contrast amount
      */
-    public function getContrast()
+    public function getContrast(): ?int
     {
-        if ($this->con === null || !preg_match('/^-*[0-9]+$/', $this->con)) {
-            return;
+        if ($this->con === null || !preg_match('/^-*[0-9]+$/', (string) $this->con)) {
+            return null;
         }
 
         if ($this->con < -100 || $this->con > 100) {
-            return;
+            return null;
         }
 
         return (int) $this->con;

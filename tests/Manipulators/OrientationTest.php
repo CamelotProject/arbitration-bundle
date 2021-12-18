@@ -1,57 +1,62 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Camelot\Arbitration\Tests\Manipulators;
 
 use Camelot\Arbitration\Manipulators\Orientation;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
-class OrientationTest extends TestCase
+/**
+ * @internal
+ */
+final class OrientationTest extends TestCase
 {
-    private $manipulator;
+    private Orientation $manipulator;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->manipulator = new Orientation();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
     }
 
-    public function testCreateInstance()
+    public function testCreateInstance(): void
     {
-        $this->assertInstanceOf('League\Glide\Manipulators\Orientation', $this->manipulator);
+        static::assertInstanceOf('League\Glide\Manipulators\Orientation', $this->manipulator);
     }
 
-    public function testRun()
+    public function testRun(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock) {
+        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
             $mock->shouldReceive('orientate')->andReturn($mock)->once();
             $mock->shouldReceive('rotate')->andReturn($mock)->with('90')->once();
         });
 
-        $this->assertInstanceOf(
+        static::assertInstanceOf(
             'Intervention\Image\Image',
             $this->manipulator->setParams(['or' => 'auto'])->run($image)
         );
 
-        $this->assertInstanceOf(
+        static::assertInstanceOf(
             'Intervention\Image\Image',
             $this->manipulator->setParams(['or' => '90'])->run($image)
         );
     }
 
-    public function testGetOrientation()
+    public function testGetOrientation(): void
     {
-        $this->assertSame('auto', $this->manipulator->setParams(['or' => 'auto'])->getOrientation());
-        $this->assertSame('0', $this->manipulator->setParams(['or' => '0'])->getOrientation());
-        $this->assertSame('90', $this->manipulator->setParams(['or' => '90'])->getOrientation());
-        $this->assertSame('180', $this->manipulator->setParams(['or' => '180'])->getOrientation());
-        $this->assertSame('270', $this->manipulator->setParams(['or' => '270'])->getOrientation());
-        $this->assertSame('auto', $this->manipulator->setParams(['or' => null])->getOrientation());
-        $this->assertSame('auto', $this->manipulator->setParams(['or' => '1'])->getOrientation());
-        $this->assertSame('auto', $this->manipulator->setParams(['or' => '45'])->getOrientation());
+        static::assertSame('auto', $this->manipulator->setParams(['or' => 'auto'])->getOrientation());
+        static::assertSame('0', $this->manipulator->setParams(['or' => '0'])->getOrientation());
+        static::assertSame('90', $this->manipulator->setParams(['or' => '90'])->getOrientation());
+        static::assertSame('180', $this->manipulator->setParams(['or' => '180'])->getOrientation());
+        static::assertSame('270', $this->manipulator->setParams(['or' => '270'])->getOrientation());
+        static::assertSame('auto', $this->manipulator->setParams(['or' => null])->getOrientation());
+        static::assertSame('auto', $this->manipulator->setParams(['or' => '1'])->getOrientation());
+        static::assertSame('auto', $this->manipulator->setParams(['or' => '45'])->getOrientation());
     }
 }

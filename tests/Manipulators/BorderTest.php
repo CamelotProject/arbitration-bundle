@@ -1,114 +1,115 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Camelot\Arbitration\Tests\Manipulators;
 
 use Camelot\Arbitration\Manipulators\Border;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
-class BorderTest extends TestCase
+/**
+ * @internal
+ */
+final class BorderTest extends TestCase
 {
-    private $manipulator;
-
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
     }
 
-    public function testCreateInstance()
+    public function testCreateInstance(): void
     {
-        $this->assertInstanceOf('League\Glide\Manipulators\Border', new Border());
+        static::assertInstanceOf('League\Glide\Manipulators\Border', new Border());
     }
 
-    public function testGetBorder()
+    public function testGetBorder(): void
     {
         $image = Mockery::mock('Intervention\Image\Image');
 
         $border = new Border();
 
-        $this->assertNull($border->getBorder($image));
+        static::assertNull($border->getBorder($image));
 
-        $this->assertSame(
+        static::assertSame(
             [10.0, 'rgba(0, 0, 0, 1)', 'overlay'],
             $border->setParams(['border' => '10,black'])->getBorder($image)
         );
     }
 
-    public function testGetInvalidBorder()
+    public function testGetInvalidBorder(): void
     {
         $image = Mockery::mock('Intervention\Image\Image');
 
         $border = new Border();
 
-        $this->assertNull(
+        static::assertNull(
             $border->setParams(['border' => '0,black'])->getBorder($image)
         );
     }
 
-    public function testGetWidth()
+    public function testGetWidth(): void
     {
         $image = Mockery::mock('Intervention\Image\Image');
 
         $border = new Border();
 
-        $this->assertSame(100.0, $border->getWidth($image, 1, '100'));
+        static::assertSame(100.0, $border->getWidth($image, 1, '100'));
     }
 
-    public function testGetColor()
+    public function testGetColor(): void
     {
         $border = new Border();
 
-        $this->assertSame('rgba(0, 0, 0, 1)', $border->getColor('black'));
+        static::assertSame('rgba(0, 0, 0, 1)', $border->getColor('black'));
     }
 
-    public function testGetMethod()
+    public function testGetMethod(): void
     {
         $border = new Border();
 
-        $this->assertSame('expand', $border->getMethod('expand'));
-        $this->assertSame('shrink', $border->getMethod('shrink'));
-        $this->assertSame('overlay', $border->getMethod('overlay'));
-        $this->assertSame('overlay', $border->getMethod('invalid'));
+        static::assertSame('expand', $border->getMethod('expand'));
+        static::assertSame('shrink', $border->getMethod('shrink'));
+        static::assertSame('overlay', $border->getMethod('overlay'));
+        static::assertSame('overlay', $border->getMethod('invalid'));
     }
 
-    public function testGetDpr()
+    public function testGetDpr(): void
     {
         $border = new Border();
 
-        $this->assertSame(1.0, $border->setParams(['dpr' => 'invalid'])->getDpr());
-        $this->assertSame(1.0, $border->setParams(['dpr' => '-1'])->getDpr());
-        $this->assertSame(1.0, $border->setParams(['dpr' => '9'])->getDpr());
-        $this->assertSame(2.0, $border->setParams(['dpr' => '2'])->getDpr());
+        static::assertSame(1.0, $border->setParams(['dpr' => 'invalid'])->getDpr());
+        static::assertSame(1.0, $border->setParams(['dpr' => '-1'])->getDpr());
+        static::assertSame(1.0, $border->setParams(['dpr' => '9'])->getDpr());
+        static::assertSame(2.0, $border->setParams(['dpr' => '2'])->getDpr());
     }
 
-    public function testRunWithNoBorder()
+    public function testRunWithNoBorder(): void
     {
         $image = Mockery::mock('Intervention\Image\Image');
 
         $border = new Border();
 
-        $this->assertInstanceOf('Intervention\Image\Image', $border->run($image));
+        static::assertInstanceOf('Intervention\Image\Image', $border->run($image));
     }
 
-    public function testRunOverlay()
+    public function testRunOverlay(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock) {
+        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
             $mock->shouldReceive('width')->andReturn(100)->once();
             $mock->shouldReceive('height')->andReturn(100)->once();
-            $mock->shouldReceive('rectangle')->with(5, 5, 95, 95, Mockery::on(function ($closure) {
-                return true;
-            }))->andReturn($mock)->once();
+            $mock->shouldReceive('rectangle')->with(5, 5, 95, 95, Mockery::on(fn ($closure) => true))->andReturn($mock)->once();
         });
 
         $border = new Border();
         $border->setParams(['border' => '10,5000,overlay']);
 
-        $this->assertInstanceOf('Intervention\Image\Image', $border->run($image));
+        static::assertInstanceOf('Intervention\Image\Image', $border->run($image));
     }
 
-    public function testRunShrink()
+    public function testRunShrink(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock) {
+        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
             $mock->shouldReceive('width')->andReturn(100)->once();
             $mock->shouldReceive('height')->andReturn(100)->once();
             $mock->shouldReceive('resize')->with(80, 80)->andReturn($mock)->once();
@@ -118,18 +119,18 @@ class BorderTest extends TestCase
         $border = new Border();
         $border->setParams(['border' => '10,5000,shrink']);
 
-        $this->assertInstanceOf('Intervention\Image\Image', $border->run($image));
+        static::assertInstanceOf('Intervention\Image\Image', $border->run($image));
     }
 
-    public function testRunExpand()
+    public function testRunExpand(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock) {
+        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
             $mock->shouldReceive('resizeCanvas')->with(20, 20, 'center', true, 'rgba(0, 0, 0, 0.5)')->andReturn($mock)->once();
         });
 
         $border = new Border();
         $border->setParams(['border' => '10,5000,expand']);
 
-        $this->assertInstanceOf('Intervention\Image\Image', $border->run($image));
+        static::assertInstanceOf('Intervention\Image\Image', $border->run($image));
     }
 }

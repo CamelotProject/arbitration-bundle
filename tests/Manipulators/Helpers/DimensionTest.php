@@ -1,58 +1,63 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Camelot\Arbitration\Tests\Manipulators\Helpers;
 
 use Camelot\Arbitration\Manipulators\Helpers\Dimension;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
-class DimensionTest extends TestCase
+/**
+ * @internal
+ */
+final class DimensionTest extends TestCase
 {
-    private $image;
+    private Image $image;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->image = Mockery::mock('Intervention\Image\Image');
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
     }
 
-    public function testPixels()
+    public function testPixels(): void
     {
         $dimension = new Dimension($this->image);
-        $this->assertSame(500.0, $dimension->get('500'));
+        static::assertSame(500.0, $dimension->get('500'));
     }
 
-    public function testRelativeWidth()
+    public function testRelativeWidth(): void
     {
         $this->image->shouldReceive('width')->andReturn('100')->once();
 
         $dimension = new Dimension($this->image);
-        $this->assertSame(5.0, $dimension->get('5w'));
+        static::assertSame(5.0, $dimension->get('5w'));
     }
 
-    public function testRelativeHeight()
+    public function testRelativeHeight(): void
     {
         $this->image->shouldReceive('height')->andReturn('100')->once();
 
         $dimension = new Dimension($this->image);
-        $this->assertSame(5.0, $dimension->get('5h'));
+        static::assertSame(5.0, $dimension->get('5h'));
     }
 
-    public function testDevicePixelRatio()
+    public function testDevicePixelRatio(): void
     {
         $dimension = new Dimension($this->image, 2);
-        $this->assertSame(1000.0, $dimension->get('500'));
+        static::assertSame(1000.0, $dimension->get('500'));
     }
 
-    public function testInvalidInputs()
+    public function testInvalidInputs(): void
     {
         $dimension = new Dimension($this->image);
-        $this->assertSame(null, $dimension->get('invalid'));
-        $this->assertSame(null, $dimension->get('0'));
-        $this->assertSame(null, $dimension->get('-1'));
+        static::assertNull($dimension->get('invalid'));
+        static::assertNull($dimension->get('0'));
+        static::assertNull($dimension->get('-1'));
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Camelot\Arbitration\Manipulators;
 
 use Intervention\Image\Image;
+use function count;
 
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
@@ -20,7 +21,7 @@ class Crop extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function run(Image $image)
+    public function run(Image $image): Image
     {
         $coordinates = $this->getCoordinates($image);
 
@@ -47,15 +48,15 @@ class Crop extends BaseManipulator
      *
      * @psalm-return array{0: int, 1: int, 2: int, 3: int}|null
      */
-    public function getCoordinates(Image $image)
+    public function getCoordinates(Image $image): ?array
     {
         if ($this->crop === null) {
-            return;
+            return null;
         }
 
         $coordinates = explode(',', $this->crop);
 
-        if (\count($coordinates) !== 4
+        if (count($coordinates) !== 4
             || (!is_numeric($coordinates[0]))
             || (!is_numeric($coordinates[1]))
             || (!is_numeric($coordinates[2]))
@@ -66,7 +67,7 @@ class Crop extends BaseManipulator
             || ($coordinates[3] < 0)
             || ($coordinates[2] >= $image->width())
             || ($coordinates[3] >= $image->height())) {
-            return;
+            return null;
         }
 
         return [
@@ -85,7 +86,7 @@ class Crop extends BaseManipulator
      *
      * @return int[] the limited coordinates
      */
-    public function limitToImageBoundaries(Image $image, array $coordinates)
+    public function limitToImageBoundaries(Image $image, array $coordinates): array
     {
         if ($coordinates[0] > ($image->width() - $coordinates[2])) {
             $coordinates[0] = $image->width() - $coordinates[2];

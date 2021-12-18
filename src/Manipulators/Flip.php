@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Camelot\Arbitration\Manipulators;
 
 use Intervention\Image\Image;
+use function in_array;
 
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
@@ -20,7 +21,7 @@ class Flip extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function run(Image $image)
+    public function run(Image $image): Image
     {
         if ($flip = $this->getFlip()) {
             if ($flip === 'both') {
@@ -38,10 +39,12 @@ class Flip extends BaseManipulator
      *
      * @return null|string the resolved flip
      */
-    public function getFlip()
+    public function getFlip(): ?string
     {
-        if (\in_array($this->flip, ['h', 'v', 'both'], true)) {
+        if (in_array($this->flip, ['h', 'v', 'both'], true)) {
             return $this->flip;
         }
+
+        return null;
     }
 }
