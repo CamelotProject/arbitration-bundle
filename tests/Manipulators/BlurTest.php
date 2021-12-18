@@ -1,49 +1,54 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Camelot\Arbitration\Tests\Manipulators;
 
 use Camelot\Arbitration\Manipulators\Blur;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
-class BlurTest extends TestCase
+/**
+ * @internal
+ */
+final class BlurTest extends TestCase
 {
-    private $manipulator;
+    private Blur $manipulator;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->manipulator = new Blur();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
     }
 
-    public function testCreateInstance()
+    public function testCreateInstance(): void
     {
-        $this->assertInstanceOf('League\Glide\Manipulators\Blur', $this->manipulator);
+        static::assertInstanceOf('League\Glide\Manipulators\Blur', $this->manipulator);
     }
 
-    public function testRun()
+    public function testRun(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock) {
+        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
             $mock->shouldReceive('blur')->with('10')->once();
         });
 
-        $this->assertInstanceOf(
+        static::assertInstanceOf(
             'Intervention\Image\Image',
             $this->manipulator->setParams(['blur' => 10])->run($image)
         );
     }
 
-    public function testGetBlur()
+    public function testGetBlur(): void
     {
-        $this->assertSame(50, $this->manipulator->setParams(['blur' => '50'])->getBlur());
-        $this->assertSame(50, $this->manipulator->setParams(['blur' => 50])->getBlur());
-        $this->assertSame(null, $this->manipulator->setParams(['blur' => null])->getBlur());
-        $this->assertSame(null, $this->manipulator->setParams(['blur' => 'a'])->getBlur());
-        $this->assertSame(null, $this->manipulator->setParams(['blur' => '-1'])->getBlur());
-        $this->assertSame(null, $this->manipulator->setParams(['blur' => '101'])->getBlur());
+        static::assertSame(50, $this->manipulator->setParams(['blur' => '50'])->getBlur());
+        static::assertSame(50, $this->manipulator->setParams(['blur' => 50])->getBlur());
+        static::assertNull($this->manipulator->setParams(['blur' => null])->getBlur());
+        static::assertNull($this->manipulator->setParams(['blur' => 'a'])->getBlur());
+        static::assertNull($this->manipulator->setParams(['blur' => '-1'])->getBlur());
+        static::assertNull($this->manipulator->setParams(['blur' => '101'])->getBlur());
     }
 }

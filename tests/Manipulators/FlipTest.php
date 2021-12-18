@@ -1,51 +1,56 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Camelot\Arbitration\Tests\Manipulators;
 
 use Camelot\Arbitration\Manipulators\Flip;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
-class FlipTest extends TestCase
+/**
+ * @internal
+ */
+final class FlipTest extends TestCase
 {
-    private $manipulator;
+    private Flip $manipulator;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->manipulator = new Flip();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Mockery::close();
     }
 
-    public function testCreateInstance()
+    public function testCreateInstance(): void
     {
-        $this->assertInstanceOf('League\Glide\Manipulators\Flip', $this->manipulator);
+        static::assertInstanceOf('League\Glide\Manipulators\Flip', $this->manipulator);
     }
 
-    public function testRun()
+    public function testRun(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock) {
+        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
             $mock->shouldReceive('flip')->andReturn($mock)->with('h')->once();
             $mock->shouldReceive('flip')->andReturn($mock)->with('v')->once();
         });
 
-        $this->assertInstanceOf(
+        static::assertInstanceOf(
             'Intervention\Image\Image',
             $this->manipulator->setParams(['flip' => 'h'])->run($image)
         );
 
-        $this->assertInstanceOf(
+        static::assertInstanceOf(
             'Intervention\Image\Image',
             $this->manipulator->setParams(['flip' => 'v'])->run($image)
         );
     }
 
-    public function testGetFlip()
+    public function testGetFlip(): void
     {
-        $this->assertSame('h', $this->manipulator->setParams(['flip' => 'h'])->getFlip());
-        $this->assertSame('v', $this->manipulator->setParams(['flip' => 'v'])->getFlip());
+        static::assertSame('h', $this->manipulator->setParams(['flip' => 'h'])->getFlip());
+        static::assertSame('v', $this->manipulator->setParams(['flip' => 'v'])->getFlip());
     }
 }

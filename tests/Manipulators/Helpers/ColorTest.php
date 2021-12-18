@@ -1,51 +1,56 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Camelot\Arbitration\Tests\Manipulators\Helpers;
 
 use Camelot\Arbitration\Manipulators\Helpers\Color;
 use PHPUnit\Framework\TestCase;
 
-class ColorTest extends TestCase
+/**
+ * @internal
+ */
+final class ColorTest extends TestCase
 {
-    public function testThreeDigitColorCode()
+    public function testThreeDigitColorCode(): void
     {
         $color = new Color('000');
 
-        $this->assertSame('rgba(0, 0, 0, 1)', $color->formatted());
+        static::assertSame('rgba(0, 0, 0, 1)', $color->formatted());
     }
 
-    public function testFourDigitColorCode()
+    public function testFourDigitColorCode(): void
     {
         $color = new Color('5000');
 
-        $this->assertSame('rgba(0, 0, 0, 0.5)', $color->formatted());
+        static::assertSame('rgba(0, 0, 0, 0.5)', $color->formatted());
     }
 
-    public function testSixDigitColorCode()
+    public function testSixDigitColorCode(): void
     {
         $color = new Color('000000');
 
-        $this->assertSame('rgba(0, 0, 0, 1)', $color->formatted());
+        static::assertSame('rgba(0, 0, 0, 1)', $color->formatted());
     }
 
-    public function testEightDigitColorCode()
+    public function testEightDigitColorCode(): void
     {
         $color = new Color('50000000');
 
-        $this->assertSame('rgba(0, 0, 0, 0.5)', $color->formatted());
+        static::assertSame('rgba(0, 0, 0, 0.5)', $color->formatted());
     }
 
-    public function testNamedColorCode()
+    public function testNamedColorCode(): void
     {
         $color = new Color('black');
 
-        $this->assertSame('rgba(0, 0, 0, 1)', $color->formatted());
+        static::assertSame('rgba(0, 0, 0, 1)', $color->formatted());
     }
 
-    public function testUnknownColor()
+    public function testUnknownColor(): void
     {
         $color = new Color('unknown');
 
-        $this->assertSame('rgba(255, 255, 255, 0)', $color->formatted());
+        static::assertSame('rgba(255, 255, 255, 0)', $color->formatted());
     }
 }

@@ -16,7 +16,7 @@ interface ManipulatorInterface
      *
      * @param array $params the manipulation params
      */
-    public function setParams(array $params);
+    public function setParams(array $params): self;
 
     /**
      * Perform the image manipulation.
@@ -25,5 +25,5 @@ interface ManipulatorInterface
      *
      * @return Image the manipulated image
      */
-    public function run(Image $image);
+    public function run(Image $image): Image;
 }

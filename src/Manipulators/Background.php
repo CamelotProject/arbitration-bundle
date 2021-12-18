@@ -21,7 +21,7 @@ class Background extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function run(Image $image)
+    public function run(Image $image): Image
     {
         if ($this->bg === null) {
             return $image;

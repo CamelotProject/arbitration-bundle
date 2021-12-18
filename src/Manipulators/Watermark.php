@@ -9,6 +9,8 @@ use Intervention\Image\Image;
 use League\Flysystem\FilesystemException as FilesystemV2Exception;
 use League\Flysystem\FilesystemOperator;
 use League\Glide\Filesystem\FilesystemException;
+use function in_array;
+use function is_string;
 
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
@@ -26,27 +28,18 @@ use League\Glide\Filesystem\FilesystemException;
  */
 class Watermark extends BaseManipulator
 {
-    /**
-     * The watermarks file system.
-     *
-     * @var null|FilesystemOperator
-     */
-    protected $watermarks;
-
-    /**
-     * The watermarks path prefix.
-     *
-     * @var string
-     */
-    protected $watermarksPathPrefix;
+    /** The watermarks file system. */
+    protected ?FilesystemOperator $watermarks;
+    /** The watermarks path prefix. */
+    protected string $watermarksPathPrefix;
 
     /**
      * Create Watermark instance.
      *
      * @param FilesystemOperator $watermarks           the watermarks file system
-     * @param mixed              $watermarksPathPrefix
+     * @param mixed|string       $watermarksPathPrefix
      */
-    public function __construct(FilesystemOperator $watermarks = null, $watermarksPathPrefix = '')
+    public function __construct(FilesystemOperator $watermarks = null, string $watermarksPathPrefix = '')
     {
         $this->setWatermarks($watermarks);
         $this->setWatermarksPathPrefix($watermarksPathPrefix);
@@ -67,7 +60,7 @@ class Watermark extends BaseManipulator
      *
      * @return null|FilesystemOperator the watermarks file system
      */
-    public function getWatermarks()
+    public function getWatermarks(): ?FilesystemOperator
     {
         return $this->watermarks;
     }
@@ -77,7 +70,7 @@ class Watermark extends BaseManipulator
      *
      * @param string $watermarksPathPrefix the watermarks path prefix
      */
-    public function setWatermarksPathPrefix($watermarksPathPrefix = ''): void
+    public function setWatermarksPathPrefix(string $watermarksPathPrefix = ''): void
     {
         $this->watermarksPathPrefix = trim($watermarksPathPrefix, '/');
     }
@@ -87,7 +80,7 @@ class Watermark extends BaseManipulator
      *
      * @return string the watermarks path prefix
      */
-    public function getWatermarksPathPrefix()
+    public function getWatermarksPathPrefix(): string
     {
         return $this->watermarksPathPrefix;
     }
@@ -99,7 +92,7 @@ class Watermark extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function run(Image $image)
+    public function run(Image $image): Image
     {
         if ($watermark = $this->getImage($image)) {
             $markw = $this->getDimension($image, 'markw');
@@ -140,18 +133,18 @@ class Watermark extends BaseManipulator
      *
      * @return null|Image the watermark image
      */
-    public function getImage(Image $image)
+    public function getImage(Image $image): ?Image
     {
         if ($this->watermarks === null) {
-            return;
+            return null;
         }
 
-        if (!\is_string($this->mark)) {
-            return;
+        if (!is_string($this->mark)) {
+            return null;
         }
 
         if ($this->mark === '') {
-            return;
+            return null;
         }
 
         $path = $this->mark;
@@ -169,6 +162,8 @@ class Watermark extends BaseManipulator
         } catch (FilesystemV2Exception $exception) {
             throw new FilesystemException('Could not read the image `' . $path . '`.');
         }
+
+        return null;
     }
 
     /**
@@ -179,11 +174,13 @@ class Watermark extends BaseManipulator
      *
      * @return null|float the dimension
      */
-    public function getDimension(Image $image, $field)
+    public function getDimension(Image $image, string $field): ?float
     {
         if ($this->{$field}) {
-            return (new Dimension($image, $this->getDpr()))->get($this->{$field});
+            return (new Dimension($image, $this->getDpr()))->get((string) $this->{$field});
         }
+
+        return null;
     }
 
     /**
@@ -191,7 +188,7 @@ class Watermark extends BaseManipulator
      *
      * @return float the device pixel ratio
      */
-    public function getDpr()
+    public function getDpr(): float
     {
         if (!is_numeric($this->dpr)) {
             return 1.0;
@@ -209,7 +206,7 @@ class Watermark extends BaseManipulator
      *
      * @return null|string the fit
      */
-    public function getFit()
+    public function getFit(): ?string
     {
         $fitMethods = [
             'contain',
@@ -227,9 +224,11 @@ class Watermark extends BaseManipulator
             'crop-bottom-right',
         ];
 
-        if (\in_array($this->markfit, $fitMethods, true)) {
+        if (in_array($this->markfit, $fitMethods, true)) {
             return $this->markfit;
         }
+
+        return null;
     }
 
     /**
@@ -237,7 +236,7 @@ class Watermark extends BaseManipulator
      *
      * @return string the position
      */
-    public function getPosition()
+    public function getPosition(): string
     {
         $positions = [
             'top-left',
@@ -251,7 +250,7 @@ class Watermark extends BaseManipulator
             'bottom-right',
         ];
 
-        if (\in_array($this->markpos, $positions, true)) {
+        if (in_array($this->markpos, $positions, true)) {
             return $this->markpos;
         }
 
@@ -263,7 +262,7 @@ class Watermark extends BaseManipulator
      *
      * @return int the alpha
      */
-    public function getAlpha()
+    public function getAlpha(): int
     {
         if (!is_numeric($this->markalpha)) {
             return 100;

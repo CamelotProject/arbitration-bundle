@@ -11,19 +11,10 @@ use Intervention\Image\Image;
  */
 class Dimension
 {
-    /**
-     * The source image.
-     *
-     * @var Image
-     */
-    protected $image;
-
-    /**
-     * The device pixel ratio.
-     *
-     * @var float
-     */
-    protected $dpr;
+    /** The source image. */
+    protected Image $image;
+    /** The device pixel ratio. */
+    protected int|float $dpr;
 
     /**
      * Create dimension helper instance.
@@ -31,7 +22,7 @@ class Dimension
      * @param Image $image the source image
      * @param float $dpr   the device pixel ratio
      */
-    public function __construct(Image $image, $dpr = 1)
+    public function __construct(Image $image, int|float $dpr = 1)
     {
         $this->image = $image;
         $this->dpr = $dpr;
@@ -44,7 +35,7 @@ class Dimension
      *
      * @return null|float the resolved dimension
      */
-    public function get($value)
+    public function get(string $value): ?float
     {
         if (is_numeric($value) && $value > 0) {
             return (float) $value * $this->dpr;
@@ -57,5 +48,7 @@ class Dimension
 
             return (float) $this->image->width() * ((float) $matches[1] / 100);
         }
+
+        return null;
     }
 }

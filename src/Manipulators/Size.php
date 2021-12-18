@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Camelot\Arbitration\Manipulators;
 
 use Intervention\Image\Image;
+use function array_key_exists;
+use function in_array;
+use function is_numeric;
 
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
@@ -18,17 +21,15 @@ class Size extends BaseManipulator
 {
     /**
      * Maximum image size in pixels.
-     *
-     * @var null|int
      */
-    protected $maxImageSize;
+    protected ?int $maxImageSize;
 
     /**
      * Create Size instance.
      *
      * @param null|int $maxImageSize maximum image size in pixels
      */
-    public function __construct($maxImageSize = null)
+    public function __construct(int $maxImageSize = null)
     {
         $this->maxImageSize = $maxImageSize;
     }
@@ -37,9 +38,8 @@ class Size extends BaseManipulator
      * Set the maximum image size.
      *
      * @param null|int maximum image size in pixels
-     * @param mixed $maxImageSize
      */
-    public function setMaxImageSize($maxImageSize): void
+    public function setMaxImageSize(mixed $maxImageSize): void
     {
         $this->maxImageSize = $maxImageSize;
     }
@@ -49,7 +49,7 @@ class Size extends BaseManipulator
      *
      * @return null|int maximum image size in pixels
      */
-    public function getMaxImageSize()
+    public function getMaxImageSize(): ?int
     {
         return $this->maxImageSize;
     }
@@ -61,7 +61,7 @@ class Size extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function run(Image $image)
+    public function run(Image $image): Image
     {
         $width = $this->getWidth();
         $height = $this->getHeight();
@@ -72,8 +72,8 @@ class Size extends BaseManipulator
         [$width, $height] = $this->applyDpr($width, $height, $dpr);
         [$width, $height] = $this->limitImageSize($width, $height);
 
-        if ((int) $width !== (int) $image->width() || (int) $height !== (int) $image->height()) {
-            $image = $this->runResize($image, $fit, (int) $width, (int) $height);
+        if ($width !== $image->width() || $height !== $image->height()) {
+            $image = $this->runResize($image, $fit, $width, $height);
         }
 
         return $image;
@@ -84,14 +84,14 @@ class Size extends BaseManipulator
      *
      * @return null|int the resolved width
      */
-    public function getWidth()
+    public function getWidth(): ?int
     {
         if (!is_numeric($this->w)) {
-            return;
+            return null;
         }
 
         if ($this->w <= 0) {
-            return;
+            return null;
         }
 
         return (int) $this->w;
@@ -102,14 +102,14 @@ class Size extends BaseManipulator
      *
      * @return null|int the resolved height
      */
-    public function getHeight()
+    public function getHeight(): ?int
     {
         if (!is_numeric($this->h)) {
-            return;
+            return null;
         }
 
         if ($this->h <= 0) {
-            return;
+            return null;
         }
 
         return (int) $this->h;
@@ -120,13 +120,13 @@ class Size extends BaseManipulator
      *
      * @return string the resolved fit
      */
-    public function getFit()
+    public function getFit(): ?string
     {
         if ($this->fit === null) {
             return 'contain';
         }
 
-        if (\in_array($this->fit, ['contain', 'fill', 'max', 'stretch'], true)) {
+        if (in_array($this->fit, ['contain', 'fill', 'max', 'stretch'], true)) {
             return $this->fit;
         }
 
@@ -142,7 +142,7 @@ class Size extends BaseManipulator
      *
      * @return float the device pixel ratio
      */
-    public function getDpr()
+    public function getDpr(): float
     {
         if (!is_numeric($this->dpr)) {
             return 1.0;
@@ -164,7 +164,7 @@ class Size extends BaseManipulator
      *
      * @return int[] the resolved width and height
      */
-    public function resolveMissingDimensions(Image $image, $width, $height)
+    public function resolveMissingDimensions(Image $image, ?int $width, ?int $height): array
     {
         if ($width === null && $height === null) {
             $width = $image->width();
@@ -182,10 +182,7 @@ class Size extends BaseManipulator
             $height = $size->getHeight();
         }
 
-        return [
-            (int) $width,
-            (int) $height,
-        ];
+        return [$width, $height];
     }
 
     /**
@@ -197,7 +194,7 @@ class Size extends BaseManipulator
      *
      * @return int[] the modified width and height
      */
-    public function applyDpr($width, $height, $dpr)
+    public function applyDpr(int $width, int $height, float $dpr): array
     {
         $width = $width * $dpr;
         $height = $height * $dpr;
@@ -216,7 +213,7 @@ class Size extends BaseManipulator
      *
      * @return int[] the limited width and height
      */
-    public function limitImageSize($width, $height)
+    public function limitImageSize(int $width, int $height): array
     {
         if ($this->maxImageSize !== null) {
             $imageSize = $width * $height;
@@ -243,7 +240,7 @@ class Size extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function runResize(Image $image, $fit, $width, $height)
+    public function runResize(Image $image, string $fit, int $width, int $height): Image
     {
         if ($fit === 'contain') {
             return $this->runContainResize($image, $width, $height);
@@ -277,7 +274,7 @@ class Size extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function runContainResize(Image $image, $width, $height)
+    public function runContainResize(Image $image, int $width, int $height): Image
     {
         return $image->resize($width, $height, function ($constraint): void {
             $constraint->aspectRatio();
@@ -293,7 +290,7 @@ class Size extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function runMaxResize(Image $image, $width, $height)
+    public function runMaxResize(Image $image, int $width, int $height): Image
     {
         return $image->resize($width, $height, function ($constraint): void {
             $constraint->aspectRatio();
@@ -310,7 +307,7 @@ class Size extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function runFillResize($image, $width, $height)
+    public function runFillResize(Image $image, int $width, int $height): Image
     {
         $image = $this->runMaxResize($image, $width, $height);
 
@@ -326,7 +323,7 @@ class Size extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function runStretchResize(Image $image, $width, $height)
+    public function runStretchResize(Image $image, int $width, int $height): Image
     {
         return $image->resize($width, $height);
     }
@@ -340,7 +337,7 @@ class Size extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function runCropResize(Image $image, $width, $height)
+    public function runCropResize(Image $image, int $width, int $height): Image
     {
         [$resize_width, $resize_height] = $this->resolveCropResizeDimensions($image, $width, $height);
 
@@ -364,7 +361,7 @@ class Size extends BaseManipulator
      *
      * @return array the resize dimensions
      */
-    public function resolveCropResizeDimensions(Image $image, $width, $height)
+    public function resolveCropResizeDimensions(Image $image, int $width, int $height): array
     {
         if ($height > $width * ($image->height() / $image->width())) {
             return [$height * ($image->width() / $image->height()), $height];
@@ -382,7 +379,7 @@ class Size extends BaseManipulator
      *
      * @return array the crop offset
      */
-    public function resolveCropOffset(Image $image, $width, $height)
+    public function resolveCropOffset(Image $image, int $width, int $height): array
     {
         [$offset_percentage_x, $offset_percentage_y] = $this->getCrop();
 
@@ -418,7 +415,7 @@ class Size extends BaseManipulator
      *
      * @psalm-return array{0: int, 1: int, 2: float}
      */
-    public function getCrop()
+    public function getCrop(): array
     {
         $cropMethods = [
             'crop-top-left' => [0, 0, 1.0],
@@ -436,7 +433,7 @@ class Size extends BaseManipulator
             return [50, 50, 1.0];
         }
 
-        if (\array_key_exists($this->fit, $cropMethods)) {
+        if (array_key_exists($this->fit, $cropMethods)) {
             return $cropMethods[$this->fit];
         }
 

@@ -7,6 +7,7 @@ namespace Camelot\Arbitration\Manipulators;
 use Camelot\Arbitration\Manipulators\Helpers\Color;
 use Camelot\Arbitration\Manipulators\Helpers\Dimension;
 use Intervention\Image\Image;
+use function in_array;
 
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
@@ -23,7 +24,7 @@ class Border extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function run(Image $image)
+    public function run(Image $image): Image
     {
         if ($border = $this->getBorder($image)) {
             [$width, $color, $method] = $border;
@@ -53,10 +54,10 @@ class Border extends BaseManipulator
      *
      * @psalm-return array{0: float, 1: string, 2: string}|null
      */
-    public function getBorder(Image $image)
+    public function getBorder(Image $image): ?array
     {
         if (!$this->border) {
-            return;
+            return null;
         }
 
         $values = explode(',', $this->border);
@@ -68,6 +69,8 @@ class Border extends BaseManipulator
         if ($width) {
             return [$width, $color, $method];
         }
+
+        return null;
     }
 
     /**
@@ -79,7 +82,7 @@ class Border extends BaseManipulator
      *
      * @return null|float the resolved border width
      */
-    public function getWidth(Image $image, $dpr, $width)
+    public function getWidth(Image $image, float|int $dpr, string $width): ?float
     {
         return (new Dimension($image, $dpr))->get($width);
     }
@@ -91,7 +94,7 @@ class Border extends BaseManipulator
      *
      * @return string the formatted color
      */
-    public function getColor($color)
+    public function getColor(string $color): string
     {
         return (new Color($color))->formatted();
     }
@@ -103,9 +106,9 @@ class Border extends BaseManipulator
      *
      * @return string the resolved border method
      */
-    public function getMethod($method)
+    public function getMethod(?string $method): string
     {
-        if (!\in_array($method, ['expand', 'shrink', 'overlay'], true)) {
+        if (!in_array($method, ['expand', 'shrink', 'overlay'], true)) {
             return 'overlay';
         }
 
@@ -117,7 +120,7 @@ class Border extends BaseManipulator
      *
      * @return float the device pixel ratio
      */
-    public function getDpr()
+    public function getDpr(): float
     {
         if (!is_numeric($this->dpr)) {
             return 1.0;
@@ -139,7 +142,7 @@ class Border extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function runOverlay(Image $image, $width, $color)
+    public function runOverlay(Image $image, float|int $width, string $color): Image
     {
         return $image->rectangle(
             (int) round($width / 2),
@@ -161,7 +164,7 @@ class Border extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function runShrink(Image $image, $width, $color)
+    public function runShrink(Image $image, float|int $width, string $color): Image
     {
         return $image
             ->resize(
@@ -187,7 +190,7 @@ class Border extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function runExpand(Image $image, $width, $color)
+    public function runExpand(Image $image, float|int $width, string $color): Image
     {
         return $image->resizeCanvas(
             (int) round($width * 2),

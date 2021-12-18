@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Camelot\Arbitration\Manipulators;
 
 use Intervention\Image\Image;
+use function array_key_exists;
+use function in_array;
 
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
@@ -21,12 +23,12 @@ class Encode extends BaseManipulator
      *
      * @return Image the manipulated image
      */
-    public function run(Image $image)
+    public function run(Image $image): Image
     {
         $format = $this->getFormat($image);
         $quality = $this->getQuality();
 
-        if (\in_array($format, ['jpg', 'pjpg'], true)) {
+        if (in_array($format, ['jpg', 'pjpg'], true)) {
             $image = $image->getDriver()
                 ->newImage($image->width(), $image->height(), '#fff')
                 ->insert($image, 'top-left', 0, 0)
@@ -48,7 +50,7 @@ class Encode extends BaseManipulator
      *
      * @return string the resolved format
      */
-    public function getFormat(Image $image)
+    public function getFormat(Image $image): string
     {
         $allowed = [
             'avif' => 'image/avif',
@@ -59,7 +61,7 @@ class Encode extends BaseManipulator
             'webp' => 'image/webp',
         ];
 
-        if (\array_key_exists($this->fm, $allowed)) {
+        if (array_key_exists($this->fm, $allowed)) {
             return $this->fm;
         }
 
@@ -75,7 +77,7 @@ class Encode extends BaseManipulator
      *
      * @return int the resolved quality
      */
-    public function getQuality()
+    public function getQuality(): int
     {
         $default = 90;
 
