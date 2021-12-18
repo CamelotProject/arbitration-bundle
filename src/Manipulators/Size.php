@@ -19,9 +19,7 @@ use function is_numeric;
  */
 class Size extends BaseManipulator
 {
-    /**
-     * Maximum image size in pixels.
-     */
+    /** Maximum image size in pixels. */
     protected ?int $maxImageSize;
 
     /**
