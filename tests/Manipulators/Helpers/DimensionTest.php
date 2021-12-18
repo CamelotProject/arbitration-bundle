@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Camelot\Arbitration\Tests\Manipulators\Helpers;
 
 use Camelot\Arbitration\Manipulators\Helpers\Dimension;
+use Intervention\Image\Image;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -17,7 +18,7 @@ final class DimensionTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->image = Mockery::mock('Intervention\Image\Image');
+        $this->image = Mockery::mock(Image::class);
     }
 
     protected function tearDown(): void

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Camelot\Arbitration\Tests\Manipulators;
 
 use Camelot\Arbitration\Manipulators\Border;
+use Intervention\Image\Image;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -20,12 +21,12 @@ final class BorderTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf('League\Glide\Manipulators\Border', new Border());
+        static::assertInstanceOf(Border::class, new Border());
     }
 
     public function testGetBorder(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image');
+        $image = Mockery::mock(Image::class);
 
         $border = new Border();
 
@@ -39,7 +40,7 @@ final class BorderTest extends TestCase
 
     public function testGetInvalidBorder(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image');
+        $image = Mockery::mock(Image::class);
 
         $border = new Border();
 
@@ -50,7 +51,7 @@ final class BorderTest extends TestCase
 
     public function testGetWidth(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image');
+        $image = Mockery::mock(Image::class);
 
         $border = new Border();
 
@@ -86,16 +87,16 @@ final class BorderTest extends TestCase
 
     public function testRunWithNoBorder(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image');
+        $image = Mockery::mock(Image::class);
 
         $border = new Border();
 
-        static::assertInstanceOf('Intervention\Image\Image', $border->run($image));
+        static::assertInstanceOf(Image::class, $border->run($image));
     }
 
     public function testRunOverlay(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('width')->andReturn(100)->once();
             $mock->shouldReceive('height')->andReturn(100)->once();
             $mock->shouldReceive('rectangle')->with(5, 5, 95, 95, Mockery::on(fn ($closure) => true))->andReturn($mock)->once();
@@ -104,12 +105,12 @@ final class BorderTest extends TestCase
         $border = new Border();
         $border->setParams(['border' => '10,5000,overlay']);
 
-        static::assertInstanceOf('Intervention\Image\Image', $border->run($image));
+        static::assertInstanceOf(Image::class, $border->run($image));
     }
 
     public function testRunShrink(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('width')->andReturn(100)->once();
             $mock->shouldReceive('height')->andReturn(100)->once();
             $mock->shouldReceive('resize')->with(80, 80)->andReturn($mock)->once();
@@ -119,18 +120,18 @@ final class BorderTest extends TestCase
         $border = new Border();
         $border->setParams(['border' => '10,5000,shrink']);
 
-        static::assertInstanceOf('Intervention\Image\Image', $border->run($image));
+        static::assertInstanceOf(Image::class, $border->run($image));
     }
 
     public function testRunExpand(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('resizeCanvas')->with(20, 20, 'center', true, 'rgba(0, 0, 0, 0.5)')->andReturn($mock)->once();
         });
 
         $border = new Border();
         $border->setParams(['border' => '10,5000,expand']);
 
-        static::assertInstanceOf('Intervention\Image\Image', $border->run($image));
+        static::assertInstanceOf(Image::class, $border->run($image));
     }
 }

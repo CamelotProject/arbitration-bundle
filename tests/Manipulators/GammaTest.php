@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Camelot\Arbitration\Tests\Manipulators;
 
 use Camelot\Arbitration\Manipulators\Gamma;
+use Intervention\Image\Image;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -27,19 +28,16 @@ final class GammaTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf('League\Glide\Manipulators\Gamma', $this->manipulator);
+        static::assertInstanceOf(Gamma::class, $this->manipulator);
     }
 
     public function testRun(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('gamma')->with('1.5')->once();
         });
 
-        static::assertInstanceOf(
-            'Intervention\Image\Image',
-            $this->manipulator->setParams(['gam' => '1.5'])->run($image)
-        );
+        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['gam' => '1.5'])->run($image));
     }
 
     public function testGetGamma(): void

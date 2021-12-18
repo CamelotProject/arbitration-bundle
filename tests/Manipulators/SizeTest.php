@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Camelot\Arbitration\Tests\Manipulators;
 
 use Camelot\Arbitration\Manipulators\Size;
+use Intervention\Image\Image;
 use Mockery;
 use Mockery\Matcher\Closure;
 use PHPUnit\Framework\TestCase;
@@ -30,7 +31,7 @@ final class SizeTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf('League\Glide\Manipulators\Size', $this->manipulator);
+        static::assertInstanceOf(Size::class, $this->manipulator);
     }
 
     public function testSetMaxImageSize(): void
@@ -46,16 +47,13 @@ final class SizeTest extends TestCase
 
     public function testRun(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('width')->andReturn('200')->twice();
             $mock->shouldReceive('height')->andReturn('200')->once();
             $mock->shouldReceive('resize')->with(100, 100, $this->callback)->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(
-            'Intervention\Image\Image',
-            $this->manipulator->setParams(['w' => 100])->run($image)
-        );
+        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['w' => 100])->run($image));
     }
 
     public function testGetWidth(): void
@@ -121,7 +119,7 @@ final class SizeTest extends TestCase
 
     public function testResolveMissingDimensions(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('width')->andReturn(400);
             $mock->shouldReceive('height')->andReturn(200);
         });
@@ -133,7 +131,7 @@ final class SizeTest extends TestCase
 
     public function testResolveMissingDimensionsWithOddDimensions(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('width')->andReturn(1024);
             $mock->shouldReceive('height')->andReturn(553);
         });
@@ -151,7 +149,7 @@ final class SizeTest extends TestCase
 
     public function testRunResize(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('width')->andReturn(100)->times(4);
             $mock->shouldReceive('height')->andReturn(100)->times(4);
             $mock->shouldReceive('crop')->andReturn($mock)->once();
@@ -160,98 +158,65 @@ final class SizeTest extends TestCase
             $mock->shouldReceive('resizeCanvas')->with(100, 100, 'center')->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(
-            'Intervention\Image\Image',
-            $this->manipulator->runResize($image, 'contain', 100, 100)
-        );
+        static::assertInstanceOf(Image::class, $this->manipulator->runResize($image, 'contain', 100, 100));
 
-        static::assertInstanceOf(
-            'Intervention\Image\Image',
-            $this->manipulator->runResize($image, 'fill', 100, 100)
-        );
+        static::assertInstanceOf(Image::class, $this->manipulator->runResize($image, 'fill', 100, 100));
 
-        static::assertInstanceOf(
-            'Intervention\Image\Image',
-            $this->manipulator->runResize($image, 'max', 100, 100)
-        );
+        static::assertInstanceOf(Image::class, $this->manipulator->runResize($image, 'max', 100, 100));
 
-        static::assertInstanceOf(
-            'Intervention\Image\Image',
-            $this->manipulator->runResize($image, 'stretch', 100, 100)
-        );
+        static::assertInstanceOf(Image::class, $this->manipulator->runResize($image, 'stretch', 100, 100));
 
-        static::assertInstanceOf(
-            'Intervention\Image\Image',
-            $this->manipulator->runResize($image, 'crop', 100, 100)
-        );
+        static::assertInstanceOf(Image::class, $this->manipulator->runResize($image, 'crop', 100, 100));
 
-        static::assertInstanceOf(
-            'Intervention\Image\Image',
-            $this->manipulator->runResize($image, 'invalid', 100, 100)
-        );
+        static::assertInstanceOf(Image::class, $this->manipulator->runResize($image, 'invalid', 100, 100));
     }
 
     public function testRunContainResize(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('resize')->with(100, 100, $this->callback)->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(
-            'Intervention\Image\Image',
-            $this->manipulator->runContainResize($image, 100, 100)
-        );
+        static::assertInstanceOf(Image::class, $this->manipulator->runContainResize($image, 100, 100));
     }
 
     public function testRunFillResize(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('resize')->with(100, 100, $this->callback)->andReturn($mock)->once();
             $mock->shouldReceive('resizeCanvas')->with(100, 100, 'center')->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(
-            'Intervention\Image\Image',
-            $this->manipulator->runFillResize($image, 100, 100)
-        );
+        static::assertInstanceOf(Image::class, $this->manipulator->runFillResize($image, 100, 100));
     }
 
     public function testRunMaxResize(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('resize')->with(100, 100, $this->callback)->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(
-            'Intervention\Image\Image',
-            $this->manipulator->runMaxResize($image, 100, 100)
-        );
+        static::assertInstanceOf(Image::class, $this->manipulator->runMaxResize($image, 100, 100));
     }
 
     public function testRunStretchResize(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('resize')->with(100, 100)->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(
-            'Intervention\Image\Image',
-            $this->manipulator->runStretchResize($image, 100, 100)
-        );
+        static::assertInstanceOf(Image::class, $this->manipulator->runStretchResize($image, 100, 100));
     }
 
     public function testRunCropResize(): void
     {
-        $image = Mockery::mock('Intervention\Image\Image', function ($mock): void {
+        $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('width')->andReturn(100)->times(4);
             $mock->shouldReceive('height')->andReturn(100)->times(4);
             $mock->shouldReceive('resize')->with(100, 100, $this->callback)->andReturn($mock)->once();
             $mock->shouldReceive('crop')->with(100, 100, 0, 0)->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(
-            'Intervention\Image\Image',
-            $this->manipulator->runCropResize($image, 100, 100, 'center')
-        );
+        static::assertInstanceOf(Image::class, $this->manipulator->runCropResize($image, 100, 100, 'center'));
     }
 }
