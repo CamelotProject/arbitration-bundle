@@ -6,11 +6,12 @@ namespace Camelot\Arbitration\Manipulators;
 
 use Intervention\Image\Image;
 use function in_array;
+use function is_numeric;
 
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
  *
- * @property string $orientation
+ * @property int|string $orientation
  */
 class Orientation extends BaseManipulator
 {
@@ -35,12 +36,12 @@ class Orientation extends BaseManipulator
     /**
      * Resolve orientation.
      *
-     * @return string the resolved orientation
+     * @return int|string the resolved orientation
      */
-    public function getOrientation(): string
+    public function getOrientation(): string|int
     {
-        if (in_array($this->orientation, ['auto', '0', '90', '180', '270'], true)) {
-            return $this->orientation;
+        if (is_numeric($this->orientation) && in_array((int) $this->orientation, [0, 90, 180, 270], true)) {
+            return (int) $this->orientation;
         }
 
         return 'auto';
