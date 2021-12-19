@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Camelot\Arbitration\Tests\Manipulators;
 
+use Camelot\Arbitration\Filesystem\FilesystemInterface;
 use Camelot\Arbitration\Manipulators\Watermark;
 use Intervention\Image\AbstractDriver;
 use Intervention\Image\Image;
-use League\Flysystem\FilesystemOperator;
-use League\Glide\Filesystem\FilesystemException;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
  * @covers \Camelot\Arbitration\Manipulators\BaseManipulator
@@ -21,10 +21,12 @@ use PHPUnit\Framework\TestCase;
 final class WatermarkTest extends TestCase
 {
     private Watermark $manipulator;
+    private FilesystemInterface $filesystem;
 
     protected function setUp(): void
     {
-        $this->manipulator = new Watermark(Mockery::mock(FilesystemOperator::class));
+        $this->filesystem = Mockery::mock(FilesystemInterface::class);
+        $this->manipulator = new Watermark();
     }
 
     protected function tearDown(): void
@@ -37,52 +39,37 @@ final class WatermarkTest extends TestCase
         static::assertInstanceOf(Watermark::class, $this->manipulator);
     }
 
-    public function testSetWatermarks(): void
-    {
-        $this->manipulator->setWatermarks(Mockery::mock(FilesystemOperator::class));
-        static::assertInstanceOf(FilesystemOperator::class, $this->manipulator->getWatermarks());
-    }
-
-    public function testGetWatermarks(): void
-    {
-        static::assertInstanceOf(FilesystemOperator::class, $this->manipulator->getWatermarks());
-    }
-
-    public function testSetWatermarksPathPrefix(): void
-    {
-        $this->manipulator->setWatermarksPathPrefix('watermarks/');
-        static::assertSame('watermarks', $this->manipulator->getWatermarksPathPrefix());
-    }
-
-    public function testGetWatermarksPathPrefix(): void
-    {
-        static::assertSame('', $this->manipulator->getWatermarksPathPrefix());
-    }
-
     public function testRun(): void
     {
-        static::markTestIncomplete();
-
         $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('insert')->once();
             $mock->shouldReceive('getDriver')->andReturn(Mockery::mock(AbstractDriver::class, function ($mock): void {
                 $mock->shouldReceive('init')->with('content')->andReturn(Mockery::mock(Image::class, function ($mock): void {
                     $mock->shouldReceive('width')->andReturn(0)->once();
-                    $mock->shouldReceive('resize')->once();
+                    $mock->shouldReceive('resize')->andReturn($mock)->once();
+                    $mock->shouldReceive('opacity')->with(75)->once();
                 }))->once();
             }))->once();
         });
 
-        $this->manipulator->setWatermarks(Mockery::mock(FilesystemOperator::class, function ($watermarks): void {
-            $watermarks->shouldReceive('fileExists')->with('image.jpg')->andReturn(true)->once();
-            $watermarks->shouldReceive('read')->with('image.jpg')->andReturn('content')->once();
-        }));
+        $this->filesystem
+            ->expects('exists')
+            ->once()
+            ->andReturnTrue()
+        ;
+        $this->filesystem
+            ->expects('readFile')
+            ->once()
+            ->andReturn('content')
+        ;
 
+        $this->manipulator->setFilesystem($this->filesystem);
         $this->manipulator->setParams([
-            'mark' => 'image.jpg',
-            'markw' => '100',
-            'markh' => '100',
-            'markpad' => '10',
+            'watermark_path' => 'image.jpg',
+            'watermark_width' => '100',
+            'watermark_height' => '100',
+            'watermark_padding' => '10',
+            'watermark_alpha' => '75',
         ]);
 
         static::assertInstanceOf(Image::class, $this->manipulator->run($image));
@@ -91,21 +78,18 @@ final class WatermarkTest extends TestCase
     /** @doesNotPerformAssertions */
     public function testGetImage(): void
     {
-        static::markTestIncomplete();
-
-        $this->manipulator->getWatermarks()
-            ->shouldReceive('fileExists')
-            ->with('watermarks/image.jpg')
-            ->andReturn(true)
+        $this->filesystem
+            ->expects('exists')
+            ->with('image.jpg')
             ->once()
-            ->shouldReceive('read')
-            ->with('watermarks/image.jpg')
-            ->andReturn('content')
-            ->once()
+            ->andReturnTrue()
         ;
-
-        $this->manipulator->setWatermarksPathPrefix('watermarks');
-
+        $this->filesystem
+            ->expects('readFile')
+            ->with('image.jpg')
+            ->once()
+            ->andReturn('content')
+        ;
         $driver = Mockery::mock(AbstractDriver::class);
         $driver->shouldReceive('init')
             ->with('content')
@@ -119,30 +103,42 @@ final class WatermarkTest extends TestCase
             ->once()
         ;
 
-        $this->manipulator->setParams(['mark' => 'image.jpg'])->getImage($image);
+        $this->manipulator->setFilesystem($this->filesystem);
+        $this->manipulator->setParams(['watermark_path' => 'image.jpg'])->getImage($image);
     }
 
     public function testGetImageWithUnreadableSource(): void
     {
-        static::markTestIncomplete();
+        $this->expectException(IOException::class);
+        $this->expectExceptionMessage('Failed to read file "image.jpg"');
 
-        $this->expectException(FilesystemException::class);
-        $this->expectExceptionMessage('Could not read the image `image.jpg`.');
+        $this->filesystem
+            ->expects('exists')
+            ->with('image.jpg')
+            ->once()
+            ->andReturnTrue()
+        ;
+        $this->filesystem
+            ->expects('readFile')
+            ->with('image.jpg')
+            ->once()
+            ->andThrow(IOException::class, 'Failed to read file "image.jpg"')
+        ;
 
-        $this->manipulator->getWatermarks()
-            ->shouldReceive('fileExists')
-            ->with('image.jpg')
-            ->andReturn(true)
-            ->once()
-            ->shouldReceive('read')
-            ->with('image.jpg')
-            ->andThrow('League\Flysystem\UnableToReadFile')
-            ->once()
+        $driver = Mockery::mock(AbstractDriver::class);
+        $driver->shouldReceive('init')
+            ->with('content')
+            ->andReturn(Mockery::mock(Image::class))
         ;
 
         $image = Mockery::mock(Image::class);
+        $image->shouldReceive('getDriver')
+            ->andReturn($driver)
+            ->once()
+        ;
 
-        $this->manipulator->setParams(['mark' => 'image.jpg'])->getImage($image);
+        $this->manipulator->setFilesystem($this->filesystem);
+        $this->manipulator->setParams(['watermark_path' => 'image.jpg'])->getImage($image);
     }
 
     public function testGetImageWithoutMarkParam(): void
@@ -156,16 +152,7 @@ final class WatermarkTest extends TestCase
     {
         $image = Mockery::mock(Image::class);
 
-        static::assertNull($this->manipulator->setParams(['mark' => ''])->getImage($image));
-    }
-
-    public function testGetImageWithoutWatermarksFilesystem(): void
-    {
-        $this->manipulator->setWatermarks(null);
-
-        $image = Mockery::mock(Image::class);
-
-        static::assertNull($this->manipulator->setParams(['mark' => 'image.jpg'])->getImage($image));
+        static::assertNull($this->manipulator->setParams(['watermark_path' => ''])->getImage($image));
     }
 
     public function providerDimensions(): iterable

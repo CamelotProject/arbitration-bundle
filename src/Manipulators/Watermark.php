@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Camelot\Arbitration\Manipulators;
 
+use Camelot\Arbitration\Filesystem\FilesystemInterface;
 use Camelot\Arbitration\Manipulators\Helpers\Dimension;
 use Intervention\Image\Image;
-use League\Flysystem\FilesystemException as FilesystemV2Exception;
-use League\Flysystem\FilesystemOperator;
-use League\Glide\Filesystem\FilesystemException;
 use function in_array;
-use function is_string;
 
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
@@ -28,61 +25,15 @@ use function is_string;
  */
 class Watermark extends BaseManipulator
 {
-    /** The watermarks file system. */
-    protected ?FilesystemOperator $watermarks;
-    /** The watermarks path prefix. */
-    protected string $watermarksPathPrefix;
+    private ?FilesystemInterface $filesystem = null;
 
-    /**
-     * Create Watermark instance.
-     *
-     * @param FilesystemOperator $watermarks           the watermarks file system
-     * @param mixed|string       $watermarksPathPrefix
-     */
-    public function __construct(FilesystemOperator $watermarks = null, string $watermarksPathPrefix = '')
+    public function setFilesystem(FilesystemInterface $filesystem): void
     {
-        $this->setWatermarks($watermarks);
-        $this->setWatermarksPathPrefix($watermarksPathPrefix);
-    }
+        if ($this->filesystem) {
+            throw new \RuntimeException(sprintf('Can not change %s after it has been set', FilesystemInterface::class));
+        }
 
-    /**
-     * Set the watermarks file system.
-     *
-     * @param FilesystemOperator $watermarks the watermarks file system
-     */
-    public function setWatermarks(FilesystemOperator $watermarks = null): void
-    {
-        $this->watermarks = $watermarks;
-    }
-
-    /**
-     * Get the watermarks file system.
-     *
-     * @return null|FilesystemOperator the watermarks file system
-     */
-    public function getWatermarks(): ?FilesystemOperator
-    {
-        return $this->watermarks;
-    }
-
-    /**
-     * Set the watermarks path prefix.
-     *
-     * @param string $watermarksPathPrefix the watermarks path prefix
-     */
-    public function setWatermarksPathPrefix(string $watermarksPathPrefix = ''): void
-    {
-        $this->watermarksPathPrefix = trim($watermarksPathPrefix, '/');
-    }
-
-    /**
-     * Get the watermarks path prefix.
-     *
-     * @return string the watermarks path prefix
-     */
-    public function getWatermarksPathPrefix(): string
-    {
-        return $this->watermarksPathPrefix;
+        $this->filesystem = $filesystem;
     }
 
     /**
@@ -95,32 +46,7 @@ class Watermark extends BaseManipulator
     public function run(Image $image): Image
     {
         if ($watermark = $this->getImage($image)) {
-            $markw = $this->getDimension($image, 'markw');
-            $markh = $this->getDimension($image, 'markh');
-            $markx = $this->getDimension($image, 'markx');
-            $marky = $this->getDimension($image, 'marky');
-            $markpad = $this->getDimension($image, 'markpad');
-            $markfit = $this->getFit();
-            $markpos = $this->getPosition();
-            $markalpha = $this->getAlpha();
-
-            if ($markpad) {
-                $markx = $marky = $markpad;
-            }
-
-            $size = new Size();
-            $size->setParams([
-                'w' => $markw,
-                'h' => $markh,
-                'fit' => $markfit,
-            ]);
-            $watermark = $size->run($watermark);
-
-            if ($markalpha < 100) {
-                $watermark->opacity($markalpha);
-            }
-
-            $image->insert($watermark, $markpos, (int) $markx, (int) $marky);
+            $this->insertWatermark($image, $watermark);
         }
 
         return $image;
@@ -135,35 +61,16 @@ class Watermark extends BaseManipulator
      */
     public function getImage(Image $image): ?Image
     {
-        if ($this->watermarks === null) {
-            return null;
-        }
-
-        if (!is_string($this->watermark_path)) {
-            return null;
-        }
-
-        if ($this->watermark_path === '') {
+        if (!$this->filesystem) {
             return null;
         }
 
         $path = $this->watermark_path;
-
-        if ($this->watermarksPathPrefix) {
-            $path = $this->watermarksPathPrefix . '/' . $path;
+        if (!$path || !$this->filesystem->exists($path)) {
+            return null;
         }
 
-        try {
-            if ($this->watermarks->fileExists($path)) {
-                $source = $this->watermarks->read($path);
-
-                return $image->getDriver()->init($source);
-            }
-        } catch (FilesystemV2Exception $exception) {
-            throw new FilesystemException('Could not read the image `' . $path . '`.');
-        }
-
-        return null;
+        return $image->getDriver()->init($this->filesystem->readFile($path));
     }
 
     /**
@@ -273,5 +180,30 @@ class Watermark extends BaseManipulator
         }
 
         return (int) $this->watermark_alpha;
+    }
+
+    private function insertWatermark(Image $image, Image $watermark): void
+    {
+        $offset_x = (int) $this->getDimension($image, 'watermark_offset_x');
+        $offset_y = (int) $this->getDimension($image, 'watermark_offset_y');
+        $padding = $this->getDimension($image, 'watermark_padding');
+
+        if ($padding) {
+            $offset_x = $offset_y = $padding;
+        }
+
+        $size = new Size();
+        $size->setParams([
+            'width' => $this->getDimension($image, 'watermark_width'),
+            'height' => $this->getDimension($image, 'watermark_height'),
+            'fit' => $this->getFit(),
+        ]);
+        $watermark = $size->run($watermark);
+
+        if ($this->getAlpha() < 100) {
+            $watermark->opacity($this->getAlpha());
+        }
+
+        $image->insert($watermark, $this->getPosition(), $offset_x, $offset_y);
     }
 }

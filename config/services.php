@@ -5,6 +5,10 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Camelot\Arbitration\Api\Intervene;
 use Camelot\Arbitration\Api\InterveneInterface;
 use Camelot\Arbitration\Configuration\Renditions;
+use Camelot\Arbitration\Filesystem\Filesystem;
+use Camelot\Arbitration\Filesystem\Finder;
+use Camelot\Arbitration\Generator\PathnameGenerator;
+use Camelot\Arbitration\Generator\PathnameGeneratorInterface;
 use Camelot\Arbitration\Manipulators;
 use Intervention\Image\ImageManager;
 
@@ -13,6 +17,8 @@ return function(ContainerConfigurator $configurator) {
         ->defaults()
         ->autowire()
         ->autoconfigure()
+        ->bind('$imagesFilesystem', service('camelot.intervention.filesystem.images'))
+        ->bind('$renderFilesystem', service('camelot.intervention.filesystem.render'))
     ;
 
     $services->set(Manipulators\Orientation::class)
@@ -46,6 +52,7 @@ return function(ContainerConfigurator $configurator) {
         ->tag('camelot.intervention.manipulator', ['priority' => 55])
     ;
     $services->set(Manipulators\Watermark::class)
+        ->call('setFilesystem', [service('camelot.intervention.filesystem.images')])
         ->tag('camelot.intervention.manipulator', ['priority' => 60])
     ;
     $services->set(Manipulators\Background::class)
@@ -67,4 +74,14 @@ return function(ContainerConfigurator $configurator) {
     $services->alias(InterveneInterface::class, Intervene::class);
 
     $services->set(Renditions::class);
+
+    $services->set('camelot.intervention.filesystem.images', Filesystem::class);
+
+    $services->set('camelot.intervention.filesystem.render', Filesystem::class);
+
+    $services->set(Finder::class);
+
+    $services->set(PathnameGenerator::class);
+
+    $services->alias(PathnameGeneratorInterface::class, PathnameGenerator::class);
 };
