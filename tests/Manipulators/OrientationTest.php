@@ -17,13 +17,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class OrientationTest extends TestCase
 {
-    private Orientation $manipulator;
-
-    protected function setUp(): void
-    {
-        $this->manipulator = new Orientation();
-    }
-
     protected function tearDown(): void
     {
         Mockery::close();
@@ -31,7 +24,7 @@ final class OrientationTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf(Orientation::class, $this->manipulator);
+        static::assertInstanceOf(Orientation::class, new Orientation());
     }
 
     public function testRun(): void
@@ -41,20 +34,26 @@ final class OrientationTest extends TestCase
             $mock->shouldReceive('rotate')->andReturn($mock)->with('90')->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['orientation' => 'auto'])->run($image));
+        static::assertInstanceOf(Image::class, (new Orientation())->setParams(['orientation' => 'auto'])->run($image));
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['orientation' => '90'])->run($image));
+        static::assertInstanceOf(Image::class, (new Orientation())->setParams(['orientation' => '90'])->run($image));
     }
 
-    public function testGetOrientation(): void
+    public function providerOrientation(): iterable
     {
-        static::assertSame('auto', $this->manipulator->setParams(['orientation' => 'auto'])->getOrientation());
-        static::assertSame(0, $this->manipulator->setParams(['orientation' => '0'])->getOrientation());
-        static::assertSame(90, $this->manipulator->setParams(['orientation' => '90'])->getOrientation());
-        static::assertSame(180, $this->manipulator->setParams(['orientation' => '180'])->getOrientation());
-        static::assertSame(270, $this->manipulator->setParams(['orientation' => '270'])->getOrientation());
-        static::assertSame('auto', $this->manipulator->setParams(['orientation' => null])->getOrientation());
-        static::assertSame('auto', $this->manipulator->setParams(['orientation' => '1'])->getOrientation());
-        static::assertSame('auto', $this->manipulator->setParams(['orientation' => '45'])->getOrientation());
+        yield ['auto', ['orientation' => 'auto']];
+        yield [0, ['orientation' => '0']];
+        yield [90, ['orientation' => '90']];
+        yield [180, ['orientation' => '180']];
+        yield [270, ['orientation' => '270']];
+        yield ['auto', ['orientation' => null]];
+        yield ['auto', ['orientation' => '1']];
+        yield ['auto', ['orientation' => '45']];
+    }
+
+    /** @dataProvider providerOrientation */
+    public function testGetOrientation(int|string $expected, array $params): void
+    {
+        static::assertSame($expected, (new Orientation())->setParams($params)->getOrientation());
     }
 }

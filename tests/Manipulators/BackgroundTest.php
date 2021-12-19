@@ -40,9 +40,9 @@ final class BackgroundTest extends TestCase
             }))->once();
         });
 
-        $border = new Background();
+        $background = new Background();
 
-        static::assertInstanceOf(Image::class, $border->run($image));
-        static::assertInstanceOf(Image::class, $border->setParams(['background' => 'black'])->run($image));
+        static::assertInstanceOf(Image::class, $background->run($image));
+        static::assertInstanceOf(Image::class, $background->setParams(['background' => 'black'])->run($image));
     }
 }

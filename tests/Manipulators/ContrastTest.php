@@ -17,13 +17,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class ContrastTest extends TestCase
 {
-    private Contrast $manipulator;
-
-    protected function setUp(): void
-    {
-        $this->manipulator = new Contrast();
-    }
-
     protected function tearDown(): void
     {
         Mockery::close();
@@ -31,7 +24,7 @@ final class ContrastTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf(Contrast::class, $this->manipulator);
+        static::assertInstanceOf(Contrast::class, (new Contrast()));
     }
 
     public function testRun(): void
@@ -40,16 +33,22 @@ final class ContrastTest extends TestCase
             $mock->shouldReceive('contrast')->with('50')->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['contrast' => 50])->run($image));
+        static::assertInstanceOf(Image::class, (new Contrast())->setParams(['contrast' => 50])->run($image));
     }
 
-    public function testGetPixelate(): void
+    public function providerContrast(): iterable
     {
-        static::assertSame(50, $this->manipulator->setParams(['contrast' => '50'])->getContrast());
-        static::assertSame(50, $this->manipulator->setParams(['contrast' => 50])->getContrast());
-        static::assertNull($this->manipulator->setParams(['contrast' => null])->getContrast());
-        static::assertNull($this->manipulator->setParams(['contrast' => '101'])->getContrast());
-        static::assertNull($this->manipulator->setParams(['contrast' => '-101'])->getContrast());
-        static::assertNull($this->manipulator->setParams(['contrast' => 'a'])->getContrast());
+        yield [50, ['contrast' => '50']];
+        yield [50, ['contrast' => 50]];
+        yield [null, ['contrast' => null]];
+        yield [null, ['contrast' => '101']];
+        yield [null, ['contrast' => '-101']];
+        yield [null, ['contrast' => 'a']];
+    }
+
+    /** @dataProvider providerContrast */
+    public function testGetContrast(?int $expected, array $params): void
+    {
+        static::assertSame($expected, (new Contrast())->setParams($params)->getContrast());
     }
 }

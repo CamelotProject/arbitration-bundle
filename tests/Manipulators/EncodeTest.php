@@ -18,31 +18,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class EncodeTest extends TestCase
 {
-    private Encode $manipulator;
-    private Image $jpg;
-    private Image $png;
-    private Image $gif;
-    private Image $webp;
-    private Image $avif;
-
-    protected function setUp(): void
-    {
-        $manager = new ImageManager();
-        $this->jpg = $manager->canvas(100, 100)->encode('jpg');
-        $this->png = $manager->canvas(100, 100)->encode('png');
-        $this->gif = $manager->canvas(100, 100)->encode('gif');
-
-        if (\function_exists('imagecreatefromwebp')) {
-            $this->webp = $manager->canvas(100, 100)->encode('webp');
-        }
-
-        if (\function_exists('imagecreatefromavif')) {
-            $this->avif = $manager->canvas(100, 100)->encode('avif');
-        }
-
-        $this->manipulator = new Encode();
-    }
-
     protected function tearDown(): void
     {
         Mockery::close();
@@ -50,95 +25,174 @@ final class EncodeTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf(Encode::class, $this->manipulator);
+        static::assertInstanceOf(Encode::class, new Encode());
     }
 
-    public function testRun(): void
+    public function providerRun(): iterable
     {
-        static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'jpg'])->run($this->jpg)->mime);
-        static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'jpg'])->run($this->png)->mime);
-        static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'jpg'])->run($this->gif)->mime);
-        static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'pjpg'])->run($this->jpg)->mime);
-        static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'pjpg'])->run($this->png)->mime);
-        static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'pjpg'])->run($this->gif)->mime);
-        static::assertSame('image/png', $this->manipulator->setParams(['format' => 'png'])->run($this->jpg)->mime);
-        static::assertSame('image/png', $this->manipulator->setParams(['format' => 'png'])->run($this->png)->mime);
-        static::assertSame('image/png', $this->manipulator->setParams(['format' => 'png'])->run($this->gif)->mime);
-        static::assertSame('image/gif', $this->manipulator->setParams(['format' => 'gif'])->run($this->jpg)->mime);
-        static::assertSame('image/gif', $this->manipulator->setParams(['format' => 'gif'])->run($this->png)->mime);
-        static::assertSame('image/gif', $this->manipulator->setParams(['format' => 'gif'])->run($this->gif)->mime);
+        $manager = new ImageManager();
+        $jpg = $manager->canvas(100, 100)->encode('jpg');
+        $png = $manager->canvas(100, 100)->encode('png');
+        $gif = $manager->canvas(100, 100)->encode('gif');
+
+        yield ['image/jpeg', ['format' => 'jpg'], $jpg];
+        yield ['image/jpeg', ['format' => 'jpg'], $png];
+        yield ['image/jpeg', ['format' => 'jpg'], $gif];
+        yield ['image/jpeg', ['format' => 'pjpg'], $jpg];
+        yield ['image/jpeg', ['format' => 'pjpg'], $png];
+        yield ['image/jpeg', ['format' => 'pjpg'], $gif];
+        yield ['image/png', ['format' => 'png'], $jpg];
+        yield ['image/png', ['format' => 'png'], $png];
+        yield ['image/png', ['format' => 'png'], $gif];
+        yield ['image/gif', ['format' => 'gif'], $jpg];
+        yield ['image/gif', ['format' => 'gif'], $png];
+        yield ['image/gif', ['format' => 'gif'], $gif];
+    }
+
+    /** @dataProvider providerRun */
+    public function testRun(string $expected, array $params, Image $image): void
+    {
+        static::assertSame($expected, (new Encode())->setParams($params)->run($image)->mime);
+    }
+
+    public function providerRunFromWebp(): iterable
+    {
+        $manager = new ImageManager();
+        $jpg = $manager->canvas(100, 100)->encode('jpg');
+        $png = $manager->canvas(100, 100)->encode('png');
+        $gif = $manager->canvas(100, 100)->encode('gif');
 
         if (\function_exists('imagecreatefromwebp')) {
-            static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'jpg'])->run($this->webp)->mime);
-            static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'pjpg'])->run($this->webp)->mime);
-            static::assertSame('image/png', $this->manipulator->setParams(['format' => 'png'])->run($this->webp)->mime);
-            static::assertSame('image/gif', $this->manipulator->setParams(['format' => 'gif'])->run($this->webp)->mime);
-            static::assertSame('image/webp', $this->manipulator->setParams(['format' => 'webp'])->run($this->jpg)->mime);
-            static::assertSame('image/webp', $this->manipulator->setParams(['format' => 'webp'])->run($this->png)->mime);
-            static::assertSame('image/webp', $this->manipulator->setParams(['format' => 'webp'])->run($this->gif)->mime);
-            static::assertSame('image/webp', $this->manipulator->setParams(['format' => 'webp'])->run($this->webp)->mime);
-        }
-        if (\function_exists('imagecreatefromavif')) {
-            static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'jpg'])->run($this->avif)->mime);
-            static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'pjpg'])->run($this->avif)->mime);
-            static::assertSame('image/png', $this->manipulator->setParams(['format' => 'png'])->run($this->avif)->mime);
-            static::assertSame('image/gif', $this->manipulator->setParams(['format' => 'gif'])->run($this->avif)->mime);
-            static::assertSame('image/avif', $this->manipulator->setParams(['format' => 'avif'])->run($this->jpg)->mime);
-            static::assertSame('image/avif', $this->manipulator->setParams(['format' => 'avif'])->run($this->png)->mime);
-            static::assertSame('image/avif', $this->manipulator->setParams(['format' => 'avif'])->run($this->gif)->mime);
-            static::assertSame('image/avif', $this->manipulator->setParams(['format' => 'avif'])->run($this->avif)->mime);
+            $webp = $manager->canvas(100, 100)->encode('webp');
         }
 
-        if (\function_exists('imagecreatefromwebp') && \function_exists('imagecreatefromavif')) {
-            static::assertSame('image/webp', $this->manipulator->setParams(['format' => 'webp'])->run($this->avif)->mime);
-            static::assertSame('image/avif', $this->manipulator->setParams(['format' => 'avif'])->run($this->webp)->mime);
+        yield ['image/jpeg', ['format' => 'jpg'], $webp];
+        yield ['image/jpeg', ['format' => 'pjpg'], $webp];
+        yield ['image/png', ['format' => 'png'], $webp];
+        yield ['image/gif', ['format' => 'gif'], $webp];
+        yield ['image/webp', ['format' => 'webp'], $jpg];
+        yield ['image/webp', ['format' => 'webp'], $png];
+        yield ['image/webp', ['format' => 'webp'], $gif];
+        yield ['image/webp', ['format' => 'webp'], $webp];
+    }
+
+    /**
+     * @requires function imagecreatefromwebp
+     * @dataProvider providerRunFromWebp
+     */
+    public function testRunFromWebp(string $expected, array $params, Image $image): void
+    {
+        static::assertSame($expected, (new Encode())->setParams($params)->run($image)->mime);
+    }
+
+    public function providerRunFromAvif(): iterable
+    {
+        $manager = new ImageManager();
+        $jpg = $manager->canvas(100, 100)->encode('jpg');
+        $png = $manager->canvas(100, 100)->encode('png');
+        $gif = $manager->canvas(100, 100)->encode('gif');
+
+        if (\function_exists('imagecreatefromavif')) {
+            $avif = $manager->canvas(100, 100)->encode('avif');
+
+            yield ['image/jpeg', ['format' => 'jpg'], $avif];
+            yield ['image/jpeg', ['format' => 'pjpg'], $avif];
+            yield ['image/png', ['format' => 'png'], $avif];
+            yield ['image/gif', ['format' => 'gif'], $avif];
+            yield ['image/avif', ['format' => 'avif'], $jpg];
+            yield ['image/avif', ['format' => 'avif'], $png];
+            yield ['image/avif', ['format' => 'avif'], $gif];
+            yield ['image/avif', ['format' => 'avif'], $avif];
         }
     }
 
-    public function testGetFormat(): void
+    /**
+     * @requires function imagecreatefromavif
+     * @dataProvider providerRunFromAvif
+     */
+    public function testRunFromAvif(string $expected, array $params, Image $image): void
+    {
+        static::assertSame($expected, (new Encode())->setParams($params)->run($image)->mime);
+    }
+
+    /**
+     * @requires function imagecreatefromwebp
+     * @requires function imagecreatefromavif
+     */
+    public function testRunFromWebpAvif(): void
+    {
+        $manager = new ImageManager();
+        $webp = $manager->canvas(100, 100)->encode('webp');
+        $avif = $manager->canvas(100, 100)->encode('avif');
+
+        static::assertSame('image/webp', (new Encode())->setParams(['format' => 'webp'])->run($avif)->mime);
+        static::assertSame('image/avif', (new Encode())->setParams(['format' => 'avif'])->run($webp)->mime);
+    }
+
+    public function providerFormatMatching(): iterable
+    {
+        yield ['jpg', ['format' => 'jpg']];
+        yield ['png', ['format' => 'png']];
+        yield ['gif', ['format' => 'gif']];
+    }
+
+    /** @dataProvider providerFormatMatching */
+    public function testGetFormatMatching(string $expected, array $params): void
+    {
+        static::assertSame($expected, (new Encode())->setParams($params)->getFormat(Mockery::mock(Image::class)));
+    }
+
+    public function providerFormatUnspecifiedOrInvalid(): iterable
+    {
+        yield ['jpg', ['format' => null], 'image/jpeg'];
+        yield ['png', ['format' => null], 'image/png'];
+        yield ['gif', ['format' => null], 'image/gif'];
+        yield ['jpg', ['format' => null], 'image/jpeg'];
+        yield ['jpg', ['format' => ''], 'image/jpeg'];
+        yield ['jpg', ['format' => 'invalid'], 'image/jpeg'];
+        yield ['jpg', ['format' => 'invalid'], 'image/squirrel '];
+    }
+
+    /** @dataProvider providerFormatUnspecifiedOrInvalid */
+    public function testGetFormatUnspecifiedOrInvalid(string $expected, array $params, string $mime): void
+    {
+        $image = Mockery::mock(Image::class, fn ($mock) => $mock->shouldReceive('mime')->andReturn($mime)->once());
+
+        static::assertSame($expected, (new Encode())->setParams($params)->getFormat($image));
+    }
+
+    /** @requires function imagecreatefromwebp */
+    public function testGetFormatWebp(): void
     {
         $image = Mockery::mock(Image::class, function ($mock): void {
-            $mock->shouldReceive('mime')->andReturn('image/jpeg')->once();
-            $mock->shouldReceive('mime')->andReturn('image/png')->once();
-            $mock->shouldReceive('mime')->andReturn('image/gif')->once();
-            $mock->shouldReceive('mime')->andReturn('image/bmp')->once();
-            $mock->shouldReceive('mime')->andReturn('image/jpeg')->twice();
-
-            if (\function_exists('imagecreatefromwebp')) {
-                $mock->shouldReceive('mime')->andReturn('image/webp')->once();
-            }
-            if (\function_exists('imagecreatefromavif')) {
-                $mock->shouldReceive('mime')->andReturn('image/avif')->once();
-            }
+            $mock->shouldReceive('mime')->andReturn('image/webp')->once();
         });
-
-        static::assertSame('jpg', $this->manipulator->setParams(['format' => 'jpg'])->getFormat($image));
-        static::assertSame('png', $this->manipulator->setParams(['format' => 'png'])->getFormat($image));
-        static::assertSame('gif', $this->manipulator->setParams(['format' => 'gif'])->getFormat($image));
-        static::assertSame('jpg', $this->manipulator->setParams(['format' => null])->getFormat($image));
-        static::assertSame('png', $this->manipulator->setParams(['format' => null])->getFormat($image));
-        static::assertSame('gif', $this->manipulator->setParams(['format' => null])->getFormat($image));
-        static::assertSame('jpg', $this->manipulator->setParams(['format' => null])->getFormat($image));
-        static::assertSame('jpg', $this->manipulator->setParams(['format' => ''])->getFormat($image));
-        static::assertSame('jpg', $this->manipulator->setParams(['format' => 'invalid'])->getFormat($image));
-
-        if (\function_exists('imagecreatefromwebp')) {
-            static::assertSame('webp', $this->manipulator->setParams(['format' => null])->getFormat($image));
-        }
-
-        if (\function_exists('imagecreatefromavif')) {
-            static::assertSame('avif', $this->manipulator->setParams(['format' => null])->getFormat($image));
-        }
+        static::assertSame('webp', (new Encode())->setParams(['format' => null])->getFormat($image));
     }
 
-    public function testGetQuality(): void
+    /** @requires function imagecreatefromavif */
+    public function testGetFormatAvif(): void
     {
-        static::assertSame(100, $this->manipulator->setParams(['quality' => '100'])->getQuality());
-        static::assertSame(100, $this->manipulator->setParams(['quality' => 100])->getQuality());
-        static::assertSame(90, $this->manipulator->setParams(['quality' => null])->getQuality());
-        static::assertSame(90, $this->manipulator->setParams(['quality' => 'a'])->getQuality());
-        static::assertSame(50, $this->manipulator->setParams(['quality' => '50.50'])->getQuality());
-        static::assertSame(90, $this->manipulator->setParams(['quality' => '-1'])->getQuality());
-        static::assertSame(90, $this->manipulator->setParams(['quality' => '101'])->getQuality());
+        $image = Mockery::mock(Image::class, function ($mock): void {
+            $mock->shouldReceive('mime')->andReturn('image/avif')->once();
+        });
+        static::assertSame('avif', (new Encode())->setParams(['format' => null])->getFormat($image));
+    }
+
+    public function providerQuality(): iterable
+    {
+        yield [100, ['quality' => '100']];
+        yield [100, ['quality' => 100]];
+        yield [90, ['quality' => null]];
+        yield [90, ['quality' => 'a']];
+        yield [50, ['quality' => '50.50']];
+        yield [90, ['quality' => '-1']];
+        yield [90, ['quality' => '101']];
+    }
+
+    /** @dataProvider providerQuality */
+    public function testGetQuality(?int $expected, array $params): void
+    {
+        static::assertSame($expected, (new Encode())->setParams($params)->getQuality());
     }
 }

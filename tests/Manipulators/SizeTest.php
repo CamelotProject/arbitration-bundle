@@ -18,12 +18,10 @@ use PHPUnit\Framework\TestCase;
  */
 final class SizeTest extends TestCase
 {
-    private Size $manipulator;
     private Closure $callback;
 
     protected function setUp(): void
     {
-        $this->manipulator = new Size();
         $this->callback = Mockery::on(fn () => true);
     }
 
@@ -34,18 +32,20 @@ final class SizeTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf(Size::class, $this->manipulator);
+        static::assertInstanceOf(Size::class, new Size());
     }
 
     public function testSetMaxImageSize(): void
     {
-        $this->manipulator->setMaxImageSize(500 * 500);
-        static::assertSame(500 * 500, $this->manipulator->getMaxImageSize());
+        $manipulator = new Size();
+        $manipulator->setMaxImageSize(500 * 500);
+
+        static::assertSame(500 * 500, $manipulator->getMaxImageSize());
     }
 
     public function testGetMaxImageSize(): void
     {
-        static::assertNull($this->manipulator->getMaxImageSize());
+        static::assertNull((new Size())->getMaxImageSize());
     }
 
     public function testRun(): void
@@ -56,80 +56,116 @@ final class SizeTest extends TestCase
             $mock->shouldReceive('resize')->with(100, 100, $this->callback)->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['width' => 100])->run($image));
+        static::assertInstanceOf(Image::class, (new Size())->setParams(['width' => 100])->run($image));
     }
 
-    public function testGetWidth(): void
+    public function providerWidth(): iterable
     {
-        static::assertSame(100, $this->manipulator->setParams(['width' => 100])->getWidth());
-        static::assertSame(100, $this->manipulator->setParams(['width' => 100.1])->getWidth());
-        static::assertNull($this->manipulator->setParams(['width' => null])->getWidth());
-        static::assertNull($this->manipulator->setParams(['width' => 'a'])->getWidth());
-        static::assertNull($this->manipulator->setParams(['width' => '-100'])->getWidth());
+        yield [100, ['width' => 100]];
+        yield [100, ['width' => 100.1]];
+        yield [null, ['width' => null]];
+        yield [null, ['width' => 'a']];
+        yield [null, ['width' => '-100']];
     }
 
-    public function testGetHeight(): void
+    /** @dataProvider providerWidth */
+    public function testGetWidth(?int $expected, array $params): void
     {
-        static::assertSame(100, $this->manipulator->setParams(['height' => 100])->getHeight());
-        static::assertSame(100, $this->manipulator->setParams(['height' => 100.1])->getHeight());
-        static::assertNull($this->manipulator->setParams(['height' => null])->getHeight());
-        static::assertNull($this->manipulator->setParams(['height' => 'a'])->getHeight());
-        static::assertNull($this->manipulator->setParams(['height' => '-100'])->getHeight());
+        static::assertSame($expected, (new Size())->setParams($params)->getWidth());
     }
 
-    public function testGetFit(): void
+    public function providerHeight(): iterable
     {
-        static::assertSame('contain', $this->manipulator->setParams(['fit' => 'contain'])->getFit());
-        static::assertSame('fill', $this->manipulator->setParams(['fit' => 'fill'])->getFit());
-        static::assertSame('max', $this->manipulator->setParams(['fit' => 'max'])->getFit());
-        static::assertSame('stretch', $this->manipulator->setParams(['fit' => 'stretch'])->getFit());
-        static::assertSame('crop', $this->manipulator->setParams(['fit' => 'crop'])->getFit());
-        static::assertSame('contain', $this->manipulator->setParams(['fit' => 'invalid'])->getFit());
+        yield [100, ['height' => 100]];
+        yield [100, ['height' => 100.1]];
+        yield [null, ['height' => null]];
+        yield [null, ['height' => 'a']];
+        yield [null, ['height' => '-100']];
     }
 
-    public function testGetCrop(): void
+    /** @dataProvider providerHeight */
+    public function testGetHeight(?int $expected, array $params): void
     {
-        static::assertSame([0, 0, 1.0], $this->manipulator->setParams(['fit' => 'crop-top-left'])->getCrop());
-        static::assertSame([0, 100, 1.0], $this->manipulator->setParams(['fit' => 'crop-bottom-left'])->getCrop());
-        static::assertSame([0, 50, 1.0], $this->manipulator->setParams(['fit' => 'crop-left'])->getCrop());
-        static::assertSame([100, 0, 1.0], $this->manipulator->setParams(['fit' => 'crop-top-right'])->getCrop());
-        static::assertSame([100, 100, 1.0], $this->manipulator->setParams(['fit' => 'crop-bottom-right'])->getCrop());
-        static::assertSame([100, 50, 1.0], $this->manipulator->setParams(['fit' => 'crop-right'])->getCrop());
-        static::assertSame([50, 0, 1.0], $this->manipulator->setParams(['fit' => 'crop-top'])->getCrop());
-        static::assertSame([50, 100, 1.0], $this->manipulator->setParams(['fit' => 'crop-bottom'])->getCrop());
-        static::assertSame([50, 50, 1.0], $this->manipulator->setParams(['fit' => 'crop-center'])->getCrop());
-        static::assertSame([50, 50, 1.0], $this->manipulator->setParams(['fit' => 'crop'])->getCrop());
-        static::assertSame([50, 50, 1.0], $this->manipulator->setParams(['fit' => 'crop-center'])->getCrop());
-        static::assertSame([25, 75, 1.0], $this->manipulator->setParams(['fit' => 'crop-25-75'])->getCrop());
-        static::assertSame([0, 100, 1.0], $this->manipulator->setParams(['fit' => 'crop-0-100'])->getCrop());
-        static::assertSame([50, 50, 1.0], $this->manipulator->setParams(['fit' => 'crop-101-102'])->getCrop());
-        static::assertSame([25, 75, 1.0], $this->manipulator->setParams(['fit' => 'crop-25-75-1'])->getCrop());
-        static::assertSame([25, 75, 1.5], $this->manipulator->setParams(['fit' => 'crop-25-75-1.5'])->getCrop());
-        static::assertSame([25, 75, 1.555], $this->manipulator->setParams(['fit' => 'crop-25-75-1.555'])->getCrop());
-        static::assertSame([25, 75, 2.0], $this->manipulator->setParams(['fit' => 'crop-25-75-2'])->getCrop());
-        static::assertSame([25, 75, 100.0], $this->manipulator->setParams(['fit' => 'crop-25-75-100'])->getCrop());
-        static::assertSame([50, 50, 1.0], $this->manipulator->setParams(['fit' => 'crop-25-75-101'])->getCrop());
-        static::assertSame([50, 50, 1.0], $this->manipulator->setParams(['fit' => 'invalid'])->getCrop());
+        static::assertSame($expected, (new Size())->setParams($params)->getHeight());
     }
 
-    public function testGetDpr(): void
+    public function providerFit(): iterable
     {
-        static::assertSame(1.0, $this->manipulator->setParams(['dpr' => 'invalid'])->getDpr());
-        static::assertSame(1.0, $this->manipulator->setParams(['dpr' => '-1'])->getDpr());
-        static::assertSame(1.0, $this->manipulator->setParams(['dpr' => '9'])->getDpr());
-        static::assertSame(2.0, $this->manipulator->setParams(['dpr' => '2'])->getDpr());
+        yield ['contain', ['fit' => 'contain']];
+        yield ['fill', ['fit' => 'fill']];
+        yield ['max', ['fit' => 'max']];
+        yield ['stretch', ['fit' => 'stretch']];
+        yield ['crop', ['fit' => 'crop']];
+        yield ['contain', ['fit' => 'invalid']];
     }
 
-    public function testResolveMissingDimensions(): void
+    /** @dataProvider providerFit */
+    public function testGetFit(string $expected, array $params): void
+    {
+        static::assertSame($expected, (new Size())->setParams($params)->getFit());
+    }
+
+    public function providerCrop(): iterable
+    {
+        yield [[0, 0, 1.0], ['fit' => 'crop-top-left']];
+        yield [[0, 100, 1.0], ['fit' => 'crop-bottom-left']];
+        yield [[0, 50, 1.0], ['fit' => 'crop-left']];
+        yield [[100, 0, 1.0], ['fit' => 'crop-top-right']];
+        yield [[100, 100, 1.0], ['fit' => 'crop-bottom-right']];
+        yield [[100, 50, 1.0], ['fit' => 'crop-right']];
+        yield [[50, 0, 1.0], ['fit' => 'crop-top']];
+        yield [[50, 100, 1.0], ['fit' => 'crop-bottom']];
+        yield [[50, 50, 1.0], ['fit' => 'crop-center']];
+        yield [[50, 50, 1.0], ['fit' => 'crop']];
+        yield [[50, 50, 1.0], ['fit' => 'crop-center']];
+        yield [[25, 75, 1.0], ['fit' => 'crop-25-75']];
+        yield [[0, 100, 1.0], ['fit' => 'crop-0-100']];
+        yield [[50, 50, 1.0], ['fit' => 'crop-101-102']];
+        yield [[25, 75, 1.0], ['fit' => 'crop-25-75-1']];
+        yield [[25, 75, 1.5], ['fit' => 'crop-25-75-1.5']];
+        yield [[25, 75, 1.555], ['fit' => 'crop-25-75-1.555']];
+        yield [[25, 75, 2.0], ['fit' => 'crop-25-75-2']];
+        yield [[25, 75, 100.0], ['fit' => 'crop-25-75-100']];
+        yield [[50, 50, 1.0], ['fit' => 'crop-25-75-101']];
+        yield [[50, 50, 1.0], ['fit' => 'invalid']];
+    }
+
+    /** @dataProvider providerCrop */
+    public function testGetCrop(?array $expected, array $params): void
+    {
+        static::assertSame($expected, (new Size())->setParams($params)->getCrop());
+    }
+
+    public function providerDpr(): iterable
+    {
+        yield [1.0, ['dpr' => 'invalid']];
+        yield [1.0, ['dpr' => '-1']];
+        yield [1.0, ['dpr' => '9']];
+        yield [2.0, ['dpr' => '2']];
+    }
+
+    /** @dataProvider providerDpr */
+    public function testGetDpr(?float $expected, array $params): void
+    {
+        static::assertSame($expected, (new Size())->setParams($params)->getDpr());
+    }
+
+    public function providerResolve(): iterable
+    {
+        yield [[400, 200], null, null];
+        yield [[100, 50], 100, null];
+        yield [[200, 100], null, 100];
+    }
+
+    /** @dataProvider providerResolve */
+    public function testResolveMissingDimensions(array $expected, ?int $width, ?int $height): void
     {
         $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('width')->andReturn(400);
             $mock->shouldReceive('height')->andReturn(200);
         });
 
-        static::assertSame([400, 200], $this->manipulator->resolveMissingDimensions($image, null, null));
-        static::assertSame([100, 50], $this->manipulator->resolveMissingDimensions($image, 100, null));
-        static::assertSame([200, 100], $this->manipulator->resolveMissingDimensions($image, null, 100));
+        static::assertSame($expected, (new Size())->resolveMissingDimensions($image, $width, $height));
     }
 
     public function testResolveMissingDimensionsWithOddDimensions(): void
@@ -139,39 +175,77 @@ final class SizeTest extends TestCase
             $mock->shouldReceive('height')->andReturn(553);
         });
 
-        static::assertSame([411, 222], $this->manipulator->resolveMissingDimensions($image, 411, null));
+        static::assertSame([411, 222], (new Size())->resolveMissingDimensions($image, 411, null));
     }
 
-    public function testLimitImageSize(): void
+    public function providerLimitSize(): iterable
     {
-        static::assertSame([1000, 1000], $this->manipulator->limitImageSize(1000, 1000));
-        $this->manipulator->setMaxImageSize(500 * 500);
-        static::assertSame([500, 500], $this->manipulator->limitImageSize(500, 500));
-        static::assertSame([500, 500], $this->manipulator->limitImageSize(1000, 1000));
+        yield [[1000, 1000], null, 1000, 1000];
+        yield [[1000, 1000], 1000 * 1000, 1000, 1000];
+        yield [[500, 500], 500 * 500, 500, 500];
+        yield [[500, 500], 500 * 500, 1000, 1000];
     }
 
-    public function testRunResize(): void
+    /** @dataProvider providerLimitSize */
+    public function testLimitImageSize(?array $expected, ?int $maxImageSize, ?int $width, ?int $height): void
+    {
+        $size = new Size();
+        $size->setMaxImageSize($maxImageSize);
+        static::assertSame($expected, $size->limitImageSize($width, $height));
+    }
+
+    public function testRunResizeContain(): void
+    {
+        $image = Mockery::mock(Image::class, function ($mock): void {
+            $mock->shouldReceive('resize')->with(100, 100, $this->callback)->andReturn($mock)->once();
+        });
+
+        static::assertInstanceOf(Image::class, (new Size())->runResize($image, 'contain', 100, 100));
+    }
+
+    public function testRunResizeFill(): void
+    {
+        $image = Mockery::mock(Image::class, function ($mock): void {
+            $mock->shouldReceive('resize')->with(100, 100, $this->callback)->andReturn($mock)->once();
+            $mock->shouldReceive('resizeCanvas')->with(100, 100, 'center')->andReturn($mock)->once();
+        });
+
+        static::assertInstanceOf(Image::class, (new Size())->runResize($image, 'fill', 100, 100));
+    }
+
+    public function testRunResizeMax(): void
+    {
+        $image = Mockery::mock(Image::class, function ($mock): void {
+            $mock->shouldReceive('resize')->with(100, 100, $this->callback)->andReturn($mock)->once();
+        });
+
+        static::assertInstanceOf(Image::class, (new Size())->runResize($image, 'max', 100, 100));
+    }
+
+    public function testRunResizeStretch(): void
+    {
+        $image = Mockery::mock(Image::class, function ($mock): void {
+            $mock->shouldReceive('resize')->with(100, 100)->andReturn($mock)->once();
+        });
+
+        static::assertInstanceOf(Image::class, (new Size())->runResize($image, 'stretch', 100, 100));
+    }
+
+    public function testRunResizeCrop(): void
     {
         $image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('width')->andReturn(100)->times(4);
             $mock->shouldReceive('height')->andReturn(100)->times(4);
             $mock->shouldReceive('crop')->andReturn($mock)->once();
-            $mock->shouldReceive('resize')->with(100, 100, $this->callback)->andReturn($mock)->times(4);
-            $mock->shouldReceive('resize')->with(100, 100)->andReturn($mock)->once();
-            $mock->shouldReceive('resizeCanvas')->with(100, 100, 'center')->andReturn($mock)->once();
+            $mock->shouldReceive('resize')->with(100, 100, $this->callback)->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->runResize($image, 'contain', 100, 100));
+        static::assertInstanceOf(Image::class, (new Size())->runResize($image, 'crop', 100, 100));
+    }
 
-        static::assertInstanceOf(Image::class, $this->manipulator->runResize($image, 'fill', 100, 100));
-
-        static::assertInstanceOf(Image::class, $this->manipulator->runResize($image, 'max', 100, 100));
-
-        static::assertInstanceOf(Image::class, $this->manipulator->runResize($image, 'stretch', 100, 100));
-
-        static::assertInstanceOf(Image::class, $this->manipulator->runResize($image, 'crop', 100, 100));
-
-        static::assertInstanceOf(Image::class, $this->manipulator->runResize($image, 'invalid', 100, 100));
+    public function testRunResizeInvalid(): void
+    {
+        static::assertInstanceOf(Image::class, (new Size())->runResize(Mockery::mock(Image::class), 'invalid', 100, 100));
     }
 
     public function testRunContainResize(): void
@@ -180,7 +254,7 @@ final class SizeTest extends TestCase
             $mock->shouldReceive('resize')->with(100, 100, $this->callback)->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->runContainResize($image, 100, 100));
+        static::assertInstanceOf(Image::class, (new Size())->runContainResize($image, 100, 100));
     }
 
     public function testRunFillResize(): void
@@ -190,7 +264,7 @@ final class SizeTest extends TestCase
             $mock->shouldReceive('resizeCanvas')->with(100, 100, 'center')->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->runFillResize($image, 100, 100));
+        static::assertInstanceOf(Image::class, (new Size())->runFillResize($image, 100, 100));
     }
 
     public function testRunMaxResize(): void
@@ -199,7 +273,7 @@ final class SizeTest extends TestCase
             $mock->shouldReceive('resize')->with(100, 100, $this->callback)->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->runMaxResize($image, 100, 100));
+        static::assertInstanceOf(Image::class, (new Size())->runMaxResize($image, 100, 100));
     }
 
     public function testRunStretchResize(): void
@@ -208,7 +282,7 @@ final class SizeTest extends TestCase
             $mock->shouldReceive('resize')->with(100, 100)->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->runStretchResize($image, 100, 100));
+        static::assertInstanceOf(Image::class, (new Size())->runStretchResize($image, 100, 100));
     }
 
     public function testRunCropResize(): void
@@ -220,6 +294,6 @@ final class SizeTest extends TestCase
             $mock->shouldReceive('crop')->with(100, 100, 0, 0)->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->runCropResize($image, 100, 100, 'center'));
+        static::assertInstanceOf(Image::class, (new Size())->runCropResize($image, 100, 100, 'center'));
     }
 }

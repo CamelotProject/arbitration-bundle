@@ -17,13 +17,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class GammaTest extends TestCase
 {
-    private Gamma $manipulator;
-
-    protected function setUp(): void
-    {
-        $this->manipulator = new Gamma();
-    }
-
     protected function tearDown(): void
     {
         Mockery::close();
@@ -31,7 +24,7 @@ final class GammaTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf(Gamma::class, $this->manipulator);
+        static::assertInstanceOf(Gamma::class, new Gamma());
     }
 
     public function testRun(): void
@@ -40,18 +33,24 @@ final class GammaTest extends TestCase
             $mock->shouldReceive('gamma')->with('1.5')->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['gamma' => '1.5'])->run($image));
+        static::assertInstanceOf(Image::class, (new Gamma())->setParams(['gamma' => '1.5'])->run($image));
     }
 
-    public function testGetGamma(): void
+    public function providerGamma(): iterable
     {
-        static::assertSame(1.5, $this->manipulator->setParams(['gamma' => '1.5'])->getGamma());
-        static::assertSame(1.5, $this->manipulator->setParams(['gamma' => 1.5])->getGamma());
-        static::assertNull($this->manipulator->setParams(['gamma' => null])->getGamma());
-        static::assertNull($this->manipulator->setParams(['gamma' => 'a'])->getGamma());
-        static::assertNull($this->manipulator->setParams(['gamma' => '.1'])->getGamma());
-        static::assertNull($this->manipulator->setParams(['gamma' => '9.999'])->getGamma());
-        static::assertNull($this->manipulator->setParams(['gamma' => '0.005'])->getGamma());
-        static::assertNull($this->manipulator->setParams(['gamma' => '-1'])->getGamma());
+        yield [1.5, ['gamma' => '1.5']];
+        yield [1.5, ['gamma' => 1.5]];
+        yield [null, ['gamma' => null]];
+        yield [null, ['gamma' => 'a']];
+        yield [null, ['gamma' => '.1']];
+        yield [null, ['gamma' => '9.999']];
+        yield [null, ['gamma' => '0.005']];
+        yield [null, ['gamma' => '-1']];
+    }
+
+    /** @dataProvider providerGamma */
+    public function testGetGamma(?float $expected, array $params): void
+    {
+        static::assertSame($expected, (new Gamma())->setParams($params)->getGamma());
     }
 }
