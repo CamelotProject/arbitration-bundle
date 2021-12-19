@@ -10,7 +10,7 @@ use Intervention\Image\Image;
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
  *
- * @property string $bg
+ * @property string $background
  */
 class Background extends BaseManipulator
 {
@@ -23,11 +23,11 @@ class Background extends BaseManipulator
      */
     public function run(Image $image): Image
     {
-        if ($this->bg === null) {
+        if ($this->background === null) {
             return $image;
         }
 
-        $color = (new Color($this->bg))->formatted();
+        $color = (new Color($this->background))->formatted();
 
         if ($color) {
             $new = $image->getDriver()->newImage($image->width(), $image->height(), $color);

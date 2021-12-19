@@ -55,43 +55,43 @@ final class EncodeTest extends TestCase
 
     public function testRun(): void
     {
-        static::assertSame('image/jpeg', $this->manipulator->setParams(['fm' => 'jpg'])->run($this->jpg)->mime);
-        static::assertSame('image/jpeg', $this->manipulator->setParams(['fm' => 'jpg'])->run($this->png)->mime);
-        static::assertSame('image/jpeg', $this->manipulator->setParams(['fm' => 'jpg'])->run($this->gif)->mime);
-        static::assertSame('image/jpeg', $this->manipulator->setParams(['fm' => 'pjpg'])->run($this->jpg)->mime);
-        static::assertSame('image/jpeg', $this->manipulator->setParams(['fm' => 'pjpg'])->run($this->png)->mime);
-        static::assertSame('image/jpeg', $this->manipulator->setParams(['fm' => 'pjpg'])->run($this->gif)->mime);
-        static::assertSame('image/png', $this->manipulator->setParams(['fm' => 'png'])->run($this->jpg)->mime);
-        static::assertSame('image/png', $this->manipulator->setParams(['fm' => 'png'])->run($this->png)->mime);
-        static::assertSame('image/png', $this->manipulator->setParams(['fm' => 'png'])->run($this->gif)->mime);
-        static::assertSame('image/gif', $this->manipulator->setParams(['fm' => 'gif'])->run($this->jpg)->mime);
-        static::assertSame('image/gif', $this->manipulator->setParams(['fm' => 'gif'])->run($this->png)->mime);
-        static::assertSame('image/gif', $this->manipulator->setParams(['fm' => 'gif'])->run($this->gif)->mime);
+        static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'jpg'])->run($this->jpg)->mime);
+        static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'jpg'])->run($this->png)->mime);
+        static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'jpg'])->run($this->gif)->mime);
+        static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'pjpg'])->run($this->jpg)->mime);
+        static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'pjpg'])->run($this->png)->mime);
+        static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'pjpg'])->run($this->gif)->mime);
+        static::assertSame('image/png', $this->manipulator->setParams(['format' => 'png'])->run($this->jpg)->mime);
+        static::assertSame('image/png', $this->manipulator->setParams(['format' => 'png'])->run($this->png)->mime);
+        static::assertSame('image/png', $this->manipulator->setParams(['format' => 'png'])->run($this->gif)->mime);
+        static::assertSame('image/gif', $this->manipulator->setParams(['format' => 'gif'])->run($this->jpg)->mime);
+        static::assertSame('image/gif', $this->manipulator->setParams(['format' => 'gif'])->run($this->png)->mime);
+        static::assertSame('image/gif', $this->manipulator->setParams(['format' => 'gif'])->run($this->gif)->mime);
 
         if (\function_exists('imagecreatefromwebp')) {
-            static::assertSame('image/jpeg', $this->manipulator->setParams(['fm' => 'jpg'])->run($this->webp)->mime);
-            static::assertSame('image/jpeg', $this->manipulator->setParams(['fm' => 'pjpg'])->run($this->webp)->mime);
-            static::assertSame('image/png', $this->manipulator->setParams(['fm' => 'png'])->run($this->webp)->mime);
-            static::assertSame('image/gif', $this->manipulator->setParams(['fm' => 'gif'])->run($this->webp)->mime);
-            static::assertSame('image/webp', $this->manipulator->setParams(['fm' => 'webp'])->run($this->jpg)->mime);
-            static::assertSame('image/webp', $this->manipulator->setParams(['fm' => 'webp'])->run($this->png)->mime);
-            static::assertSame('image/webp', $this->manipulator->setParams(['fm' => 'webp'])->run($this->gif)->mime);
-            static::assertSame('image/webp', $this->manipulator->setParams(['fm' => 'webp'])->run($this->webp)->mime);
+            static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'jpg'])->run($this->webp)->mime);
+            static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'pjpg'])->run($this->webp)->mime);
+            static::assertSame('image/png', $this->manipulator->setParams(['format' => 'png'])->run($this->webp)->mime);
+            static::assertSame('image/gif', $this->manipulator->setParams(['format' => 'gif'])->run($this->webp)->mime);
+            static::assertSame('image/webp', $this->manipulator->setParams(['format' => 'webp'])->run($this->jpg)->mime);
+            static::assertSame('image/webp', $this->manipulator->setParams(['format' => 'webp'])->run($this->png)->mime);
+            static::assertSame('image/webp', $this->manipulator->setParams(['format' => 'webp'])->run($this->gif)->mime);
+            static::assertSame('image/webp', $this->manipulator->setParams(['format' => 'webp'])->run($this->webp)->mime);
         }
         if (\function_exists('imagecreatefromavif')) {
-            static::assertSame('image/jpeg', $this->manipulator->setParams(['fm' => 'jpg'])->run($this->avif)->mime);
-            static::assertSame('image/jpeg', $this->manipulator->setParams(['fm' => 'pjpg'])->run($this->avif)->mime);
-            static::assertSame('image/png', $this->manipulator->setParams(['fm' => 'png'])->run($this->avif)->mime);
-            static::assertSame('image/gif', $this->manipulator->setParams(['fm' => 'gif'])->run($this->avif)->mime);
-            static::assertSame('image/avif', $this->manipulator->setParams(['fm' => 'avif'])->run($this->jpg)->mime);
-            static::assertSame('image/avif', $this->manipulator->setParams(['fm' => 'avif'])->run($this->png)->mime);
-            static::assertSame('image/avif', $this->manipulator->setParams(['fm' => 'avif'])->run($this->gif)->mime);
-            static::assertSame('image/avif', $this->manipulator->setParams(['fm' => 'avif'])->run($this->avif)->mime);
+            static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'jpg'])->run($this->avif)->mime);
+            static::assertSame('image/jpeg', $this->manipulator->setParams(['format' => 'pjpg'])->run($this->avif)->mime);
+            static::assertSame('image/png', $this->manipulator->setParams(['format' => 'png'])->run($this->avif)->mime);
+            static::assertSame('image/gif', $this->manipulator->setParams(['format' => 'gif'])->run($this->avif)->mime);
+            static::assertSame('image/avif', $this->manipulator->setParams(['format' => 'avif'])->run($this->jpg)->mime);
+            static::assertSame('image/avif', $this->manipulator->setParams(['format' => 'avif'])->run($this->png)->mime);
+            static::assertSame('image/avif', $this->manipulator->setParams(['format' => 'avif'])->run($this->gif)->mime);
+            static::assertSame('image/avif', $this->manipulator->setParams(['format' => 'avif'])->run($this->avif)->mime);
         }
 
         if (\function_exists('imagecreatefromwebp') && \function_exists('imagecreatefromavif')) {
-            static::assertSame('image/webp', $this->manipulator->setParams(['fm' => 'webp'])->run($this->avif)->mime);
-            static::assertSame('image/avif', $this->manipulator->setParams(['fm' => 'avif'])->run($this->webp)->mime);
+            static::assertSame('image/webp', $this->manipulator->setParams(['format' => 'webp'])->run($this->avif)->mime);
+            static::assertSame('image/avif', $this->manipulator->setParams(['format' => 'avif'])->run($this->webp)->mime);
         }
     }
 
@@ -112,33 +112,33 @@ final class EncodeTest extends TestCase
             }
         });
 
-        static::assertSame('jpg', $this->manipulator->setParams(['fm' => 'jpg'])->getFormat($image));
-        static::assertSame('png', $this->manipulator->setParams(['fm' => 'png'])->getFormat($image));
-        static::assertSame('gif', $this->manipulator->setParams(['fm' => 'gif'])->getFormat($image));
-        static::assertSame('jpg', $this->manipulator->setParams(['fm' => null])->getFormat($image));
-        static::assertSame('png', $this->manipulator->setParams(['fm' => null])->getFormat($image));
-        static::assertSame('gif', $this->manipulator->setParams(['fm' => null])->getFormat($image));
-        static::assertSame('jpg', $this->manipulator->setParams(['fm' => null])->getFormat($image));
-        static::assertSame('jpg', $this->manipulator->setParams(['fm' => ''])->getFormat($image));
-        static::assertSame('jpg', $this->manipulator->setParams(['fm' => 'invalid'])->getFormat($image));
+        static::assertSame('jpg', $this->manipulator->setParams(['format' => 'jpg'])->getFormat($image));
+        static::assertSame('png', $this->manipulator->setParams(['format' => 'png'])->getFormat($image));
+        static::assertSame('gif', $this->manipulator->setParams(['format' => 'gif'])->getFormat($image));
+        static::assertSame('jpg', $this->manipulator->setParams(['format' => null])->getFormat($image));
+        static::assertSame('png', $this->manipulator->setParams(['format' => null])->getFormat($image));
+        static::assertSame('gif', $this->manipulator->setParams(['format' => null])->getFormat($image));
+        static::assertSame('jpg', $this->manipulator->setParams(['format' => null])->getFormat($image));
+        static::assertSame('jpg', $this->manipulator->setParams(['format' => ''])->getFormat($image));
+        static::assertSame('jpg', $this->manipulator->setParams(['format' => 'invalid'])->getFormat($image));
 
         if (\function_exists('imagecreatefromwebp')) {
-            static::assertSame('webp', $this->manipulator->setParams(['fm' => null])->getFormat($image));
+            static::assertSame('webp', $this->manipulator->setParams(['format' => null])->getFormat($image));
         }
 
         if (\function_exists('imagecreatefromavif')) {
-            static::assertSame('avif', $this->manipulator->setParams(['fm' => null])->getFormat($image));
+            static::assertSame('avif', $this->manipulator->setParams(['format' => null])->getFormat($image));
         }
     }
 
     public function testGetQuality(): void
     {
-        static::assertSame(100, $this->manipulator->setParams(['q' => '100'])->getQuality());
-        static::assertSame(100, $this->manipulator->setParams(['q' => 100])->getQuality());
-        static::assertSame(90, $this->manipulator->setParams(['q' => null])->getQuality());
-        static::assertSame(90, $this->manipulator->setParams(['q' => 'a'])->getQuality());
-        static::assertSame(50, $this->manipulator->setParams(['q' => '50.50'])->getQuality());
-        static::assertSame(90, $this->manipulator->setParams(['q' => '-1'])->getQuality());
-        static::assertSame(90, $this->manipulator->setParams(['q' => '101'])->getQuality());
+        static::assertSame(100, $this->manipulator->setParams(['quality' => '100'])->getQuality());
+        static::assertSame(100, $this->manipulator->setParams(['quality' => 100])->getQuality());
+        static::assertSame(90, $this->manipulator->setParams(['quality' => null])->getQuality());
+        static::assertSame(90, $this->manipulator->setParams(['quality' => 'a'])->getQuality());
+        static::assertSame(50, $this->manipulator->setParams(['quality' => '50.50'])->getQuality());
+        static::assertSame(90, $this->manipulator->setParams(['quality' => '-1'])->getQuality());
+        static::assertSame(90, $this->manipulator->setParams(['quality' => '101'])->getQuality());
     }
 }

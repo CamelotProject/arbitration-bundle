@@ -56,25 +56,25 @@ final class SizeTest extends TestCase
             $mock->shouldReceive('resize')->with(100, 100, $this->callback)->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['w' => 100])->run($image));
+        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['width' => 100])->run($image));
     }
 
     public function testGetWidth(): void
     {
-        static::assertSame(100, $this->manipulator->setParams(['w' => 100])->getWidth());
-        static::assertSame(100, $this->manipulator->setParams(['w' => 100.1])->getWidth());
-        static::assertNull($this->manipulator->setParams(['w' => null])->getWidth());
-        static::assertNull($this->manipulator->setParams(['w' => 'a'])->getWidth());
-        static::assertNull($this->manipulator->setParams(['w' => '-100'])->getWidth());
+        static::assertSame(100, $this->manipulator->setParams(['width' => 100])->getWidth());
+        static::assertSame(100, $this->manipulator->setParams(['width' => 100.1])->getWidth());
+        static::assertNull($this->manipulator->setParams(['width' => null])->getWidth());
+        static::assertNull($this->manipulator->setParams(['width' => 'a'])->getWidth());
+        static::assertNull($this->manipulator->setParams(['width' => '-100'])->getWidth());
     }
 
     public function testGetHeight(): void
     {
-        static::assertSame(100, $this->manipulator->setParams(['h' => 100])->getHeight());
-        static::assertSame(100, $this->manipulator->setParams(['h' => 100.1])->getHeight());
-        static::assertNull($this->manipulator->setParams(['h' => null])->getHeight());
-        static::assertNull($this->manipulator->setParams(['h' => 'a'])->getHeight());
-        static::assertNull($this->manipulator->setParams(['h' => '-100'])->getHeight());
+        static::assertSame(100, $this->manipulator->setParams(['height' => 100])->getHeight());
+        static::assertSame(100, $this->manipulator->setParams(['height' => 100.1])->getHeight());
+        static::assertNull($this->manipulator->setParams(['height' => null])->getHeight());
+        static::assertNull($this->manipulator->setParams(['height' => 'a'])->getHeight());
+        static::assertNull($this->manipulator->setParams(['height' => '-100'])->getHeight());
     }
 
     public function testGetFit(): void

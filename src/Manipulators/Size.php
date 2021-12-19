@@ -14,8 +14,8 @@ use function is_numeric;
  *
  * @property string      $dpr
  * @property null|string $fit
- * @property string      $h
- * @property string      $w
+ * @property string      $height
+ * @property string      $width
  */
 class Size extends BaseManipulator
 {
@@ -84,15 +84,15 @@ class Size extends BaseManipulator
      */
     public function getWidth(): ?int
     {
-        if (!is_numeric($this->w)) {
+        if (!is_numeric($this->width)) {
             return null;
         }
 
-        if ($this->w <= 0) {
+        if ($this->width <= 0) {
             return null;
         }
 
-        return (int) $this->w;
+        return (int) $this->width;
     }
 
     /**
@@ -102,15 +102,15 @@ class Size extends BaseManipulator
      */
     public function getHeight(): ?int
     {
-        if (!is_numeric($this->h)) {
+        if (!is_numeric($this->height)) {
             return null;
         }
 
-        if ($this->h <= 0) {
+        if ($this->height <= 0) {
             return null;
         }
 
-        return (int) $this->h;
+        return (int) $this->height;
     }
 
     /**

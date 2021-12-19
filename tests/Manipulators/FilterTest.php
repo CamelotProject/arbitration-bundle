@@ -43,9 +43,9 @@ final class FilterTest extends TestCase
                 ->shouldReceive('colorize')->with(38, 27, 12)->once()->andReturn($mock);
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['filt' => 'greyscale'])->run($image));
+        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['filter' => 'greyscale'])->run($image));
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['filt' => 'sepia'])->run($image));
+        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['filter' => 'sepia'])->run($image));
 
         static::assertInstanceOf(Image::class, $this->manipulator->setParams([])->run($image));
     }

@@ -9,7 +9,7 @@ use Intervention\Image\Image;
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
  *
- * @property null|string $gam
+ * @property null|string $gamma
  */
 class Gamma extends BaseManipulator
 {
@@ -38,14 +38,14 @@ class Gamma extends BaseManipulator
      */
     public function getGamma(): ?float
     {
-        if ($this->gam === null || !preg_match('/^[0-9]\.*[0-9]*$/', (string) $this->gam)) {
+        if ($this->gamma === null || !preg_match('/^[0-9]\.*[0-9]*$/', (string) $this->gamma)) {
             return null;
         }
 
-        if ($this->gam < 0.1 || $this->gam > 9.99) {
+        if ($this->gamma < 0.1 || $this->gamma > 9.99) {
             return null;
         }
 
-        return (float) $this->gam;
+        return (float) $this->gamma;
     }
 }

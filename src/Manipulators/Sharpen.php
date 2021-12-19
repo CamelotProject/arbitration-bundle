@@ -9,7 +9,7 @@ use Intervention\Image\Image;
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
  *
- * @property string $sharp
+ * @property string $sharpen
  */
 class Sharpen extends BaseManipulator
 {
@@ -38,14 +38,14 @@ class Sharpen extends BaseManipulator
      */
     public function getSharpen(): ?int
     {
-        if (!is_numeric($this->sharp)) {
+        if (!is_numeric($this->sharpen)) {
             return null;
         }
 
-        if ($this->sharp < 0 || $this->sharp > 100) {
+        if ($this->sharpen < 0 || $this->sharpen > 100) {
             return null;
         }
 
-        return (int) $this->sharp;
+        return (int) $this->sharpen;
     }
 }

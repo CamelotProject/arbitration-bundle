@@ -10,7 +10,7 @@ use function in_array;
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
  *
- * @property string $or
+ * @property string $orientation
  */
 class Orientation extends BaseManipulator
 {
@@ -39,8 +39,8 @@ class Orientation extends BaseManipulator
      */
     public function getOrientation(): string
     {
-        if (in_array($this->or, ['auto', '0', '90', '180', '270'], true)) {
-            return $this->or;
+        if (in_array($this->orientation, ['auto', '0', '90', '180', '270'], true)) {
+            return $this->orientation;
         }
 
         return 'auto';

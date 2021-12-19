@@ -9,7 +9,7 @@ use Intervention\Image\Image;
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
  *
- * @property null|string $con
+ * @property null|string $contrast
  */
 class Contrast extends BaseManipulator
 {
@@ -38,14 +38,14 @@ class Contrast extends BaseManipulator
      */
     public function getContrast(): ?int
     {
-        if ($this->con === null || !preg_match('/^-*[0-9]+$/', (string) $this->con)) {
+        if ($this->contrast === null || !preg_match('/^-*[0-9]+$/', (string) $this->contrast)) {
             return null;
         }
 
-        if ($this->con < -100 || $this->con > 100) {
+        if ($this->contrast < -100 || $this->contrast > 100) {
             return null;
         }
 
-        return (int) $this->con;
+        return (int) $this->contrast;
     }
 }
