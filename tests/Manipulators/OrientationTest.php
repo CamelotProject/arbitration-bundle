@@ -49,10 +49,10 @@ final class OrientationTest extends TestCase
     public function testGetOrientation(): void
     {
         static::assertSame('auto', $this->manipulator->setParams(['orientation' => 'auto'])->getOrientation());
-        static::assertSame('0', $this->manipulator->setParams(['orientation' => '0'])->getOrientation());
-        static::assertSame('90', $this->manipulator->setParams(['orientation' => '90'])->getOrientation());
-        static::assertSame('180', $this->manipulator->setParams(['orientation' => '180'])->getOrientation());
-        static::assertSame('270', $this->manipulator->setParams(['orientation' => '270'])->getOrientation());
+        static::assertSame(0, $this->manipulator->setParams(['orientation' => '0'])->getOrientation());
+        static::assertSame(90, $this->manipulator->setParams(['orientation' => '90'])->getOrientation());
+        static::assertSame(180, $this->manipulator->setParams(['orientation' => '180'])->getOrientation());
+        static::assertSame(270, $this->manipulator->setParams(['orientation' => '270'])->getOrientation());
         static::assertSame('auto', $this->manipulator->setParams(['orientation' => null])->getOrientation());
         static::assertSame('auto', $this->manipulator->setParams(['orientation' => '1'])->getOrientation());
         static::assertSame('auto', $this->manipulator->setParams(['orientation' => '45'])->getOrientation());
