@@ -11,8 +11,8 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Camelot\Intervention\Manipulators\Background
- * @covers \Camelot\Intervention\Manipulators\BaseManipulator
+ * @covers \Camelot\Arbitration\Manipulators\Background
+ * @covers \Camelot\Arbitration\Manipulators\BaseManipulator
  *
  * @internal
  */

@@ -8,7 +8,7 @@ use Camelot\Arbitration\Manipulators\Helpers\Color;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Camelot\Intervention\Manipulators\Helpers\Color
+ * @covers \Camelot\Arbitration\Manipulators\Helpers\Color
  *
  * @internal
  */

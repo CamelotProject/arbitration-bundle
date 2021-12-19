@@ -1,0 +1,32 @@
+sets:
+    list_page:
+        renditions:
+            - 300x200
+            - 150x100
+        media_queries:
+            - '(max-width: 768px) 150px'
+            - '(min-width: 768px) 300px'
+    page:
+        renditions:
+            - 1920x1080
+            - 1024x768
+        media_queries:
+            - '(max-width: 768px) 1024px'
+            - '(min-width: 768px) 1920px'
+renditions:
+    1920x1080:
+        format: webp
+        width: 1920
+        height: 1080
+    1024x768:
+        format: webp
+        width: 1024
+        height: 768
+    300x200:
+        format: png
+        width: 300
+        height: 200
+    150x100:
+        format: png
+        width: 150
+        height: 100

@@ -10,7 +10,7 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Camelot\Intervention\Manipulators\Helpers\Dimension
+ * @covers \Camelot\Arbitration\Manipulators\Helpers\Dimension
  *
  * @internal
  */
