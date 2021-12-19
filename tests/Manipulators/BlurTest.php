@@ -17,13 +17,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class BlurTest extends TestCase
 {
-    private Blur $manipulator;
-
-    protected function setUp(): void
-    {
-        $this->manipulator = new Blur();
-    }
-
     protected function tearDown(): void
     {
         Mockery::close();
@@ -31,7 +24,7 @@ final class BlurTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf(Blur::class, $this->manipulator);
+        static::assertInstanceOf(Blur::class, new Blur());
     }
 
     public function testRun(): void
@@ -40,16 +33,22 @@ final class BlurTest extends TestCase
             $mock->shouldReceive('blur')->with('10')->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['blur' => 10])->run($image));
+        static::assertInstanceOf(Image::class, (new Blur())->setParams(['blur' => 10])->run($image));
     }
 
-    public function testGetBlur(): void
+    public function providerBlur(): iterable
     {
-        static::assertSame(50, $this->manipulator->setParams(['blur' => '50'])->getBlur());
-        static::assertSame(50, $this->manipulator->setParams(['blur' => 50])->getBlur());
-        static::assertNull($this->manipulator->setParams(['blur' => null])->getBlur());
-        static::assertNull($this->manipulator->setParams(['blur' => 'a'])->getBlur());
-        static::assertNull($this->manipulator->setParams(['blur' => '-1'])->getBlur());
-        static::assertNull($this->manipulator->setParams(['blur' => '101'])->getBlur());
+        yield [50, ['blur' => '50']];
+        yield [50, ['blur' => 50]];
+        yield [null, ['blur' => null]];
+        yield [null, ['blur' => 'a']];
+        yield [null, ['blur' => '-1']];
+        yield [null, ['blur' => '101']];
+    }
+
+    /** @dataProvider providerBlur */
+    public function testGetBlur(?int $expected, array $params): void
+    {
+        static::assertSame($expected, (new Blur())->setParams($params)->getBlur());
     }
 }

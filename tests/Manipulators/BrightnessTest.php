@@ -17,13 +17,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class BrightnessTest extends TestCase
 {
-    private Brightness $manipulator;
-
-    protected function setUp(): void
-    {
-        $this->manipulator = new Brightness();
-    }
-
     protected function tearDown(): void
     {
         Mockery::close();
@@ -31,7 +24,7 @@ final class BrightnessTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf(Brightness::class, $this->manipulator);
+        static::assertInstanceOf(Brightness::class, new Brightness());
     }
 
     public function testRun(): void
@@ -40,16 +33,22 @@ final class BrightnessTest extends TestCase
             $mock->shouldReceive('brightness')->with('50')->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['brightness' => 50])->run($image));
+        static::assertInstanceOf(Image::class, (new Brightness())->setParams(['brightness' => 50])->run($image));
     }
 
-    public function testGetPixelate(): void
+    public function providerPixelate(): iterable
     {
-        static::assertSame(50, $this->manipulator->setParams(['brightness' => '50'])->getBrightness());
-        static::assertSame(50, $this->manipulator->setParams(['brightness' => 50])->getBrightness());
-        static::assertNull($this->manipulator->setParams(['brightness' => null])->getBrightness());
-        static::assertNull($this->manipulator->setParams(['brightness' => '101'])->getBrightness());
-        static::assertNull($this->manipulator->setParams(['brightness' => '-101'])->getBrightness());
-        static::assertNull($this->manipulator->setParams(['brightness' => 'a'])->getBrightness());
+        yield [50, ['brightness' => '50']];
+        yield [50, ['brightness' => 50]];
+        yield [null, ['brightness' => null]];
+        yield [null, ['brightness' => '101']];
+        yield [null, ['brightness' => '-101']];
+        yield [null, ['brightness' => 'a']];
+    }
+
+    /** @dataProvider providerPixelate */
+    public function testGetPixelate(?int $expected, array $params): void
+    {
+        static::assertSame($expected, (new Brightness())->setParams($params)->getBrightness());
     }
 }

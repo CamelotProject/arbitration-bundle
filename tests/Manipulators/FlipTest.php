@@ -17,13 +17,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class FlipTest extends TestCase
 {
-    private Flip $manipulator;
-
-    protected function setUp(): void
-    {
-        $this->manipulator = new Flip();
-    }
-
     protected function tearDown(): void
     {
         Mockery::close();
@@ -31,24 +24,39 @@ final class FlipTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf(Flip::class, $this->manipulator);
+        static::assertInstanceOf(Flip::class, new Flip());
     }
 
-    public function testRun(): void
+    public function providerRun(): iterable
     {
-        $image = Mockery::mock(Image::class, function ($mock): void {
-            $mock->shouldReceive('flip')->andReturn($mock)->with('h')->once();
-            $mock->shouldReceive('flip')->andReturn($mock)->with('v')->once();
+        yield [[], null];
+        yield [['h'], 'h'];
+        yield [['v'], 'v'];
+        yield [['h', 'v'], 'both'];
+    }
+
+    /** @dataProvider providerRun */
+    public function testRun(array $expected, ?string $direction): void
+    {
+        $image = Mockery::mock(Image::class, function ($mock) use ($expected): void {
+            foreach ($expected as $expect) {
+                $mock->shouldReceive('flip')->andReturn($mock)->with($expect)->once();
+            }
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['flip' => 'h'])->run($image));
-
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['flip' => 'v'])->run($image));
+        static::assertInstanceOf(Image::class, (new Flip())->setParams(['flip' => $direction])->run($image));
     }
 
-    public function testGetFlip(): void
+    public function providerFlip(): iterable
     {
-        static::assertSame('h', $this->manipulator->setParams(['flip' => 'h'])->getFlip());
-        static::assertSame('v', $this->manipulator->setParams(['flip' => 'v'])->getFlip());
+        yield ['h', ['flip' => 'h']];
+        yield ['v', ['flip' => 'v']];
+        yield ['both', ['flip' => 'both']];
+    }
+
+    /** @dataProvider providerFlip */
+    public function testGetFlip(?string $expected, array $params): void
+    {
+        static::assertSame($expected, (new Flip())->setParams($params)->getFlip());
     }
 }

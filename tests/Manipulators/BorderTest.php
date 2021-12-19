@@ -30,7 +30,6 @@ final class BorderTest extends TestCase
     public function testGetBorder(): void
     {
         $image = Mockery::mock(Image::class);
-
         $border = new Border();
 
         static::assertNull($border->getBorder($image));
@@ -45,56 +44,54 @@ final class BorderTest extends TestCase
     {
         $image = Mockery::mock(Image::class);
 
-        $border = new Border();
-
-        static::assertNull(
-            $border->setParams(['border' => '0,black'])->getBorder($image)
-        );
+        static::assertNull((new Border())->setParams(['border' => '0,black'])->getBorder($image));
     }
 
     public function testGetWidth(): void
     {
         $image = Mockery::mock(Image::class);
 
-        $border = new Border();
-
-        static::assertSame(100.0, $border->getWidth($image, 1, '100'));
+        static::assertSame(100.0, (new Border())->getWidth($image, 1, '100'));
     }
 
     public function testGetColor(): void
     {
-        $border = new Border();
-
-        static::assertSame('rgba(0, 0, 0, 1)', $border->getColor('black'));
+        static::assertSame('rgba(0, 0, 0, 1)', (new Border())->getColor('black'));
     }
 
-    public function testGetMethod(): void
+    public function providerMethod(): iterable
     {
-        $border = new Border();
-
-        static::assertSame('expand', $border->getMethod('expand'));
-        static::assertSame('shrink', $border->getMethod('shrink'));
-        static::assertSame('overlay', $border->getMethod('overlay'));
-        static::assertSame('overlay', $border->getMethod('invalid'));
+        yield ['expand', 'expand'];
+        yield ['shrink', 'shrink'];
+        yield ['overlay', 'overlay'];
+        yield ['overlay', 'invalid'];
     }
 
-    public function testGetDpr(): void
+    /** @dataProvider providerMethod */
+    public function testGetMethod(string $expected, string $method): void
     {
-        $border = new Border();
+        static::assertSame($expected, (new Border())->getMethod($method));
+    }
 
-        static::assertSame(1.0, $border->setParams(['dpr' => 'invalid'])->getDpr());
-        static::assertSame(1.0, $border->setParams(['dpr' => '-1'])->getDpr());
-        static::assertSame(1.0, $border->setParams(['dpr' => '9'])->getDpr());
-        static::assertSame(2.0, $border->setParams(['dpr' => '2'])->getDpr());
+    public function providerDpr(): iterable
+    {
+        yield [1.0, ['dpr' => 'invalid']];
+        yield [1.0, ['dpr' => '-1']];
+        yield [1.0, ['dpr' => '9']];
+        yield [2.0, ['dpr' => '2']];
+    }
+
+    /** @dataProvider providerDpr */
+    public function testGetDpr(float $expected, array $params): void
+    {
+        static::assertSame($expected, (new Border())->setParams($params)->getDpr());
     }
 
     public function testRunWithNoBorder(): void
     {
         $image = Mockery::mock(Image::class);
 
-        $border = new Border();
-
-        static::assertInstanceOf(Image::class, $border->run($image));
+        static::assertInstanceOf(Image::class, (new Border())->run($image));
     }
 
     public function testRunOverlay(): void

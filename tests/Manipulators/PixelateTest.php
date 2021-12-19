@@ -17,13 +17,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class PixelateTest extends TestCase
 {
-    private Pixelate $manipulator;
-
-    protected function setUp(): void
-    {
-        $this->manipulator = new Pixelate();
-    }
-
     protected function tearDown(): void
     {
         Mockery::close();
@@ -31,7 +24,7 @@ final class PixelateTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf(Pixelate::class, $this->manipulator);
+        static::assertInstanceOf(Pixelate::class, new Pixelate());
     }
 
     public function testRun(): void
@@ -40,16 +33,22 @@ final class PixelateTest extends TestCase
             $mock->shouldReceive('pixelate')->with('10')->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['pixelate' => '10'])->run($image));
+        static::assertInstanceOf(Image::class, (new Pixelate())->setParams(['pixelate' => '10'])->run($image));
     }
 
-    public function testGetPixelate(): void
+    public function providerPixelate(): iterable
     {
-        static::assertSame(50, $this->manipulator->setParams(['pixelate' => '50'])->getPixelate());
-        static::assertSame(50, $this->manipulator->setParams(['pixelate' => 50.50])->getPixelate());
-        static::assertNull($this->manipulator->setParams(['pixelate' => null])->getPixelate());
-        static::assertNull($this->manipulator->setParams(['pixelate' => 'a'])->getPixelate());
-        static::assertNull($this->manipulator->setParams(['pixelate' => '-1'])->getPixelate());
-        static::assertNull($this->manipulator->setParams(['pixelate' => '1001'])->getPixelate());
+        yield [50, ['pixelate' => '50']];
+        yield [50, ['pixelate' => 50.50]];
+        yield [null, ['pixelate' => null]];
+        yield [null, ['pixelate' => 'a']];
+        yield [null, ['pixelate' => '-1']];
+        yield [null, ['pixelate' => '1001']];
+    }
+
+    /** @dataProvider providerPixelate */
+    public function testGetPixelate(?int $expected, array $params): void
+    {
+        static::assertSame($expected, (new Pixelate())->setParams($params)->getPixelate());
     }
 }

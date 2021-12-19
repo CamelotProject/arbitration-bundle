@@ -17,13 +17,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class FilterTest extends TestCase
 {
-    private Filter $manipulator;
-
-    protected function setUp(): void
-    {
-        $this->manipulator = new Filter();
-    }
-
     protected function tearDown(): void
     {
         Mockery::close();
@@ -31,23 +24,45 @@ final class FilterTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf(Filter::class, $this->manipulator);
+        static::assertInstanceOf(Filter::class, new Filter());
     }
 
-    public function testRun(): void
+    public function testRunGreyscale(): void
     {
         $image = Mockery::mock(Image::class, function ($mock): void {
-            $mock->shouldReceive('greyscale')->twice()->andReturn($mock)
+            $mock->shouldReceive('greyscale')->once()->andReturn($mock)
+                ->shouldReceive('brightness')->never()
+                ->shouldReceive('contrast')->never()
+                ->shouldReceive('colorize')->never();
+        });
+
+        static::assertInstanceOf(Image::class, (new Filter())->setParams(['filter' => 'greyscale'])->run($image));
+    }
+
+    public function testRunSepia(): void
+    {
+        $image = Mockery::mock(Image::class, function ($mock): void {
+            $mock
+                ->shouldReceive('greyscale')->once()->andReturn($mock)
                 ->shouldReceive('brightness')->with(-10)->twice()->andReturn($mock)
                 ->shouldReceive('contrast')->with(10)->twice()->andReturn($mock)
                 ->shouldReceive('colorize')->with(38, 27, 12)->once()->andReturn($mock);
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['filter' => 'greyscale'])->run($image));
+        static::assertInstanceOf(Image::class, (new Filter())->setParams(['filter' => 'sepia'])->run($image));
+    }
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['filter' => 'sepia'])->run($image));
+    public function testRunEmptyParams(): void
+    {
+        $image = Mockery::mock(Image::class, function ($mock): void {
+            $mock
+                ->shouldReceive('greyscale')->never()
+                ->shouldReceive('brightness')->never()
+                ->shouldReceive('contrast')->never()
+                ->shouldReceive('colorize')->never();
+        });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams([])->run($image));
+        static::assertInstanceOf(Image::class, (new Filter())->setParams([])->run($image));
     }
 
     public function testRunGreyscaleFilter(): void
@@ -56,7 +71,7 @@ final class FilterTest extends TestCase
             $mock->shouldReceive('greyscale')->andReturn($mock)->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->runGreyscaleFilter($image));
+        static::assertInstanceOf(Image::class, (new Filter())->runGreyscaleFilter($image));
     }
 
     public function testRunSepiaFilter(): void
@@ -68,6 +83,6 @@ final class FilterTest extends TestCase
                 ->shouldReceive('colorize')->with(38, 27, 12)->once()->andReturn($mock);
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->runSepiaFilter($image));
+        static::assertInstanceOf(Image::class, (new Filter())->runSepiaFilter($image));
     }
 }

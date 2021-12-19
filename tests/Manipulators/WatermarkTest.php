@@ -168,69 +168,99 @@ final class WatermarkTest extends TestCase
         static::assertNull($this->manipulator->setParams(['mark' => 'image.jpg'])->getImage($image));
     }
 
-    public function testGetDimension(): void
+    public function providerDimensions(): iterable
+    {
+        yield [300.0, ['w' => '300']];
+        yield [300.0, ['w' => 300]];
+        yield [1000.0, ['w' => '50w']];
+        yield [500.0, ['w' => '50h']];
+        yield [null, ['w' => '101h']];
+        yield [null, ['w' => -1]];
+        yield [null, ['w' => '']];
+    }
+
+    /** @dataProvider providerDimensions */
+    public function testGetDimension(?float $expected, array $params): void
     {
         $image = Mockery::mock(Image::class);
         $image->shouldReceive('width')->andReturn(2000);
         $image->shouldReceive('height')->andReturn(1000);
 
-        static::assertSame(300.0, $this->manipulator->setParams(['w' => '300'])->getDimension($image, 'w'));
-        static::assertSame(300.0, $this->manipulator->setParams(['w' => 300])->getDimension($image, 'w'));
-        static::assertSame(1000.0, $this->manipulator->setParams(['w' => '50w'])->getDimension($image, 'w'));
-        static::assertSame(500.0, $this->manipulator->setParams(['w' => '50h'])->getDimension($image, 'w'));
-        static::assertNull($this->manipulator->setParams(['w' => '101h'])->getDimension($image, 'w'));
-        static::assertNull($this->manipulator->setParams(['w' => -1])->getDimension($image, 'w'));
-        static::assertNull($this->manipulator->setParams(['w' => ''])->getDimension($image, 'w'));
+        static::assertSame($expected, $this->manipulator->setParams($params)->getDimension($image, 'w'));
     }
 
-    public function testGetDpr(): void
+    public function providerDpr(): iterable
     {
-        static::assertSame(1.0, $this->manipulator->setParams(['dpr' => 'invalid'])->getDpr());
-        static::assertSame(1.0, $this->manipulator->setParams(['dpr' => '-1'])->getDpr());
-        static::assertSame(1.0, $this->manipulator->setParams(['dpr' => '9'])->getDpr());
-        static::assertSame(2.0, $this->manipulator->setParams(['dpr' => '2'])->getDpr());
+        yield [1.0, ['dpr' => 'invalid']];
+        yield [1.0, ['dpr' => '-1']];
+        yield [1.0, ['dpr' => '9']];
+        yield [2.0, ['dpr' => '2']];
     }
 
-    public function testGetFit(): void
+    /** @dataProvider providerDpr */
+    public function testGetDpr(?float $expected, array $params): void
     {
-        static::assertSame('contain', $this->manipulator->setParams(['markfit' => 'contain'])->getFit());
-        static::assertSame('max', $this->manipulator->setParams(['markfit' => 'max'])->getFit());
-        static::assertSame('stretch', $this->manipulator->setParams(['markfit' => 'stretch'])->getFit());
-        static::assertSame('crop', $this->manipulator->setParams(['markfit' => 'crop'])->getFit());
-        static::assertSame('crop-top-left', $this->manipulator->setParams(['markfit' => 'crop-top-left'])->getFit());
-        static::assertSame('crop-top', $this->manipulator->setParams(['markfit' => 'crop-top'])->getFit());
-        static::assertSame('crop-top-right', $this->manipulator->setParams(['markfit' => 'crop-top-right'])->getFit());
-        static::assertSame('crop-left', $this->manipulator->setParams(['markfit' => 'crop-left'])->getFit());
-        static::assertSame('crop-center', $this->manipulator->setParams(['markfit' => 'crop-center'])->getFit());
-        static::assertSame('crop-right', $this->manipulator->setParams(['markfit' => 'crop-right'])->getFit());
-        static::assertSame('crop-bottom-left', $this->manipulator->setParams(['markfit' => 'crop-bottom-left'])->getFit());
-        static::assertSame('crop-bottom', $this->manipulator->setParams(['markfit' => 'crop-bottom'])->getFit());
-        static::assertSame('crop-bottom-right', $this->manipulator->setParams(['markfit' => 'crop-bottom-right'])->getFit());
-        static::assertNull($this->manipulator->setParams(['markfit' => null])->getFit());
-        static::assertNull($this->manipulator->setParams(['markfit' => 'invalid'])->getFit());
+        static::assertSame($expected, $this->manipulator->setParams($params)->getDpr());
     }
 
-    public function testGetPosition(): void
+    public function providerFit(): iterable
     {
-        static::assertSame('top-left', $this->manipulator->setParams(['markpos' => 'top-left'])->getPosition());
-        static::assertSame('top', $this->manipulator->setParams(['markpos' => 'top'])->getPosition());
-        static::assertSame('top-right', $this->manipulator->setParams(['markpos' => 'top-right'])->getPosition());
-        static::assertSame('left', $this->manipulator->setParams(['markpos' => 'left'])->getPosition());
-        static::assertSame('center', $this->manipulator->setParams(['markpos' => 'center'])->getPosition());
-        static::assertSame('right', $this->manipulator->setParams(['markpos' => 'right'])->getPosition());
-        static::assertSame('bottom-left', $this->manipulator->setParams(['markpos' => 'bottom-left'])->getPosition());
-        static::assertSame('bottom', $this->manipulator->setParams(['markpos' => 'bottom'])->getPosition());
-        static::assertSame('bottom-right', $this->manipulator->setParams(['markpos' => 'bottom-right'])->getPosition());
-        static::assertSame('bottom-right', $this->manipulator->setParams([])->getPosition());
-        static::assertSame('bottom-right', $this->manipulator->setParams(['markpos' => 'invalid'])->getPosition());
+        yield ['contain', ['watermark_fit' => 'contain']];
+        yield ['max', ['watermark_fit' => 'max']];
+        yield ['stretch', ['watermark_fit' => 'stretch']];
+        yield ['crop', ['watermark_fit' => 'crop']];
+        yield ['crop-top-left', ['watermark_fit' => 'crop-top-left']];
+        yield ['crop-top', ['watermark_fit' => 'crop-top']];
+        yield ['crop-top-right', ['watermark_fit' => 'crop-top-right']];
+        yield ['crop-left', ['watermark_fit' => 'crop-left']];
+        yield ['crop-center', ['watermark_fit' => 'crop-center']];
+        yield ['crop-right', ['watermark_fit' => 'crop-right']];
+        yield ['crop-bottom-left', ['watermark_fit' => 'crop-bottom-left']];
+        yield ['crop-bottom', ['watermark_fit' => 'crop-bottom']];
+        yield ['crop-bottom-right', ['watermark_fit' => 'crop-bottom-right']];
+        yield [null, ['watermark_fit' => null]];
+        yield [null, ['watermark_fit' => 'invalid']];
     }
 
-    public function testGetAlpha(): void
+    /** @dataProvider providerFit */
+    public function testGetFit(?string $expected, array $params): void
     {
-        static::assertSame(100, $this->manipulator->setParams(['markalpha' => 'invalid'])->getAlpha());
-        static::assertSame(100, $this->manipulator->setParams(['markalpha' => 255])->getAlpha());
-        static::assertSame(100, $this->manipulator->setParams(['markalpha' => -1])->getAlpha());
-        static::assertSame(65, $this->manipulator->setParams(['markalpha' => '65'])->getAlpha());
-        static::assertSame(65, $this->manipulator->setParams(['markalpha' => 65])->getAlpha());
+        static::assertSame($expected, $this->manipulator->setParams($params)->getFit());
+    }
+
+    public function providerPosition(): iterable
+    {
+        yield ['top-left', ['watermark_position' => 'top-left']];
+        yield ['top', ['watermark_position' => 'top']];
+        yield ['top-right', ['watermark_position' => 'top-right']];
+        yield ['left', ['watermark_position' => 'left']];
+        yield ['center', ['watermark_position' => 'center']];
+        yield ['right', ['watermark_position' => 'right']];
+        yield ['bottom-left', ['watermark_position' => 'bottom-left']];
+        yield ['bottom', ['watermark_position' => 'bottom']];
+        yield ['bottom-right', ['watermark_position' => 'bottom-right']];
+        yield ['bottom-right', []];
+        yield ['bottom-right', ['watermark_position' => 'invalid']];
+    }
+
+    /** @dataProvider providerPosition */
+    public function testGetPosition(?string $expected, array $params): void
+    {
+        static::assertSame($expected, $this->manipulator->setParams($params)->getPosition());
+    }
+
+    public function providerAlpha(): iterable
+    {
+        yield [100, ['watermark_alpha' => 'invalid']];
+        yield [100, ['watermark_alpha' => 255]];
+        yield [100, ['watermark_alpha' => -1]];
+        yield [65, ['watermark_alpha' => '65']];
+        yield [65, ['watermark_alpha' => 65]];
+    }
+
+    /** @dataProvider providerAlpha */
+    public function testGetAlpha(?int $expected, array $params): void
+    {
+        static::assertSame($expected, $this->manipulator->setParams($params)->getAlpha());
     }
 }

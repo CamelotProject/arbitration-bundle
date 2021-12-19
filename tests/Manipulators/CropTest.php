@@ -17,11 +17,10 @@ use PHPUnit\Framework\TestCase;
  */
 final class CropTest extends TestCase
 {
-    private Crop $manipulator;
+    private Image $image;
 
     protected function setUp(): void
     {
-        $this->manipulator = new Crop();
         $this->image = Mockery::mock(Image::class, function ($mock): void {
             $mock->shouldReceive('width')->andReturn(100);
             $mock->shouldReceive('height')->andReturn(100);
@@ -35,36 +34,48 @@ final class CropTest extends TestCase
 
     public function testCreateInstance(): void
     {
-        static::assertInstanceOf(Crop::class, $this->manipulator);
+        static::assertInstanceOf(Crop::class, new Crop());
     }
 
     public function testRun(): void
     {
         $this->image->shouldReceive('crop')->with(100, 100, 0, 0)->once();
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['crop' => '100,100,0,0'])->run($this->image));
+        static::assertInstanceOf(Image::class, (new Crop())->setParams(['crop' => '100,100,0,0'])->run($this->image));
     }
 
-    public function testGetCoordinates(): void
+    public function providerCoordinates(): iterable
     {
-        static::assertSame([100, 100, 0, 0], $this->manipulator->setParams(['crop' => '100,100,0,0'])->getCoordinates($this->image));
-        static::assertSame([101, 1, 1, 1], $this->manipulator->setParams(['crop' => '101,1,1,1'])->getCoordinates($this->image));
-        static::assertSame([1, 101, 1, 1], $this->manipulator->setParams(['crop' => '1,101,1,1'])->getCoordinates($this->image));
-        static::assertNull($this->manipulator->setParams(['crop' => null])->getCoordinates($this->image));
-        static::assertNull($this->manipulator->setParams(['crop' => '1,1,1,'])->getCoordinates($this->image));
-        static::assertNull($this->manipulator->setParams(['crop' => '1,1,,1'])->getCoordinates($this->image));
-        static::assertNull($this->manipulator->setParams(['crop' => '1,,1,1'])->getCoordinates($this->image));
-        static::assertNull($this->manipulator->setParams(['crop' => ',1,1,1'])->getCoordinates($this->image));
-        static::assertNull($this->manipulator->setParams(['crop' => '-1,1,1,1'])->getCoordinates($this->image));
-        static::assertNull($this->manipulator->setParams(['crop' => '1,1,101,1'])->getCoordinates($this->image));
-        static::assertNull($this->manipulator->setParams(['crop' => '1,1,1,101'])->getCoordinates($this->image));
-        static::assertNull($this->manipulator->setParams(['crop' => 'a'])->getCoordinates($this->image));
-        static::assertNull($this->manipulator->setParams(['crop' => ''])->getCoordinates($this->image));
+        yield [[100, 100, 0, 0], ['crop' => '100,100,0,0']];
+        yield [[101, 1, 1, 1], ['crop' => '101,1,1,1']];
+        yield [[1, 101, 1, 1], ['crop' => '1,101,1,1']];
+        yield [null, ['crop' => null]];
+        yield [null, ['crop' => '1,1,1,']];
+        yield [null, ['crop' => '1,1,,1']];
+        yield [null, ['crop' => '1,,1,1']];
+        yield [null, ['crop' => ',1,1,1']];
+        yield [null, ['crop' => '-1,1,1,1']];
+        yield [null, ['crop' => '1,1,101,1']];
+        yield [null, ['crop' => '1,1,1,101']];
+        yield [null, ['crop' => 'a']];
+        yield [null, ['crop' => '']];
     }
 
-    public function testValidateCoordinates(): void
+    /** @dataProvider providerCoordinates */
+    public function testGetCoordinates(?array $expected, array $params): void
     {
-        static::assertSame([100, 100, 0, 0], $this->manipulator->limitToImageBoundaries($this->image, [100, 100, 0, 0]));
-        static::assertSame([90, 90, 10, 10], $this->manipulator->limitToImageBoundaries($this->image, [100, 100, 10, 10]));
+        static::assertSame($expected, (new Crop())->setParams($params)->getCoordinates($this->image));
+    }
+
+    public function providerValidateCoordinates(): iterable
+    {
+        yield [[100, 100, 0, 0], [100, 100, 0, 0]];
+        yield [[90, 90, 10, 10], [100, 100, 10, 10]];
+    }
+
+    /** @dataProvider providerValidateCoordinates */
+    public function testValidateCoordinates(?array $expected, array $params): void
+    {
+        static::assertSame($expected, (new Crop())->limitToImageBoundaries($this->image, $params));
     }
 }
