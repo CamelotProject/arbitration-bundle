@@ -9,7 +9,7 @@ use Intervention\Image\Image;
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
  *
- * @property string $filt
+ * @property string $filter
  */
 class Filter extends BaseManipulator
 {
@@ -22,11 +22,11 @@ class Filter extends BaseManipulator
      */
     public function run(Image $image): Image
     {
-        if ($this->filt === 'greyscale') {
+        if ($this->filter === 'greyscale') {
             return $this->runGreyscaleFilter($image);
         }
 
-        if ($this->filt === 'sepia') {
+        if ($this->filter === 'sepia') {
             return $this->runSepiaFilter($image);
         }
 

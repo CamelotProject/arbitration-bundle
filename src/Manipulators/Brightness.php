@@ -9,7 +9,7 @@ use Intervention\Image\Image;
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
  *
- * @property null|string $bri
+ * @property null|string $brightness
  */
 class Brightness extends BaseManipulator
 {
@@ -38,14 +38,14 @@ class Brightness extends BaseManipulator
      */
     public function getBrightness(): ?int
     {
-        if ($this->bri === null || !preg_match('/^-*[0-9]+$/', (string) $this->bri)) {
+        if ($this->brightness === null || !preg_match('/^-*[0-9]+$/', (string) $this->brightness)) {
             return null;
         }
 
-        if ($this->bri < -100 || $this->bri > 100) {
+        if ($this->brightness < -100 || $this->brightness > 100) {
             return null;
         }
 
-        return (int) $this->bri;
+        return (int) $this->brightness;
     }
 }

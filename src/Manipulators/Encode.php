@@ -11,8 +11,8 @@ use function in_array;
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
  *
- * @property string $fm
- * @property string $q
+ * @property string $format
+ * @property string $quality
  */
 class Encode extends BaseManipulator
 {
@@ -61,8 +61,8 @@ class Encode extends BaseManipulator
             'webp' => 'image/webp',
         ];
 
-        if (array_key_exists($this->fm, $allowed)) {
-            return $this->fm;
+        if (array_key_exists($this->format, $allowed)) {
+            return $this->format;
         }
 
         if ($format = array_search($image->mime(), $allowed, true)) {
@@ -81,14 +81,14 @@ class Encode extends BaseManipulator
     {
         $default = 90;
 
-        if (!is_numeric($this->q)) {
+        if (!is_numeric($this->quality)) {
             return $default;
         }
 
-        if ($this->q < 0 || $this->q > 100) {
+        if ($this->quality < 0 || $this->quality > 100) {
             return $default;
         }
 
-        return (int) $this->q;
+        return (int) $this->quality;
     }
 }

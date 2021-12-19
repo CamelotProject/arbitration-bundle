@@ -9,7 +9,7 @@ use Intervention\Image\Image;
 /**
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
  *
- * @property string $pixel
+ * @property string $pixelate
  */
 class Pixelate extends BaseManipulator
 {
@@ -38,14 +38,14 @@ class Pixelate extends BaseManipulator
      */
     public function getPixelate(): ?int
     {
-        if (!is_numeric($this->pixel)) {
+        if (!is_numeric($this->pixelate)) {
             return null;
         }
 
-        if ($this->pixel < 0 || $this->pixel > 1000) {
+        if ($this->pixelate < 0 || $this->pixelate > 1000) {
             return null;
         }
 
-        return (int) $this->pixel;
+        return (int) $this->pixelate;
     }
 }

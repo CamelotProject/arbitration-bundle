@@ -16,15 +16,15 @@ use function is_string;
  * @copyright Jonathan Reinink <jonathan@reinink.ca>
  *
  * @property string $dpr
- * @property string $mark
- * @property string $markfit
- * @property string $markh
- * @property string $markpad
- * @property string $markpos
- * @property string $markw
- * @property string $markx
- * @property string $marky
- * @property string $markalpha
+ * @property string $watermark_path
+ * @property string $watermark_fit
+ * @property string $watermark_height
+ * @property string $watermark_padding
+ * @property string $watermark_position
+ * @property string $watermark_width
+ * @property string $watermark_offset_x
+ * @property string $watermark_offset_y
+ * @property string $watermark_alpha
  */
 class Watermark extends BaseManipulator
 {
@@ -139,15 +139,15 @@ class Watermark extends BaseManipulator
             return null;
         }
 
-        if (!is_string($this->mark)) {
+        if (!is_string($this->watermark_path)) {
             return null;
         }
 
-        if ($this->mark === '') {
+        if ($this->watermark_path === '') {
             return null;
         }
 
-        $path = $this->mark;
+        $path = $this->watermark_path;
 
         if ($this->watermarksPathPrefix) {
             $path = $this->watermarksPathPrefix . '/' . $path;
@@ -224,8 +224,8 @@ class Watermark extends BaseManipulator
             'crop-bottom-right',
         ];
 
-        if (in_array($this->markfit, $fitMethods, true)) {
-            return $this->markfit;
+        if (in_array($this->watermark_fit, $fitMethods, true)) {
+            return $this->watermark_fit;
         }
 
         return null;
@@ -250,8 +250,8 @@ class Watermark extends BaseManipulator
             'bottom-right',
         ];
 
-        if (in_array($this->markpos, $positions, true)) {
-            return $this->markpos;
+        if (in_array($this->watermark_position, $positions, true)) {
+            return $this->watermark_position;
         }
 
         return 'bottom-right';
@@ -264,14 +264,14 @@ class Watermark extends BaseManipulator
      */
     public function getAlpha(): int
     {
-        if (!is_numeric($this->markalpha)) {
+        if (!is_numeric($this->watermark_alpha)) {
             return 100;
         }
 
-        if ($this->markalpha < 0 || $this->markalpha > 100) {
+        if ($this->watermark_alpha < 0 || $this->watermark_alpha > 100) {
             return 100;
         }
 
-        return (int) $this->markalpha;
+        return (int) $this->watermark_alpha;
     }
 }

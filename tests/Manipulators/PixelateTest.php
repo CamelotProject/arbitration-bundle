@@ -40,16 +40,16 @@ final class PixelateTest extends TestCase
             $mock->shouldReceive('pixelate')->with('10')->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['pixel' => '10'])->run($image));
+        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['pixelate' => '10'])->run($image));
     }
 
     public function testGetPixelate(): void
     {
-        static::assertSame(50, $this->manipulator->setParams(['pixel' => '50'])->getPixelate());
-        static::assertSame(50, $this->manipulator->setParams(['pixel' => 50.50])->getPixelate());
-        static::assertNull($this->manipulator->setParams(['pixel' => null])->getPixelate());
-        static::assertNull($this->manipulator->setParams(['pixel' => 'a'])->getPixelate());
-        static::assertNull($this->manipulator->setParams(['pixel' => '-1'])->getPixelate());
-        static::assertNull($this->manipulator->setParams(['pixel' => '1001'])->getPixelate());
+        static::assertSame(50, $this->manipulator->setParams(['pixelate' => '50'])->getPixelate());
+        static::assertSame(50, $this->manipulator->setParams(['pixelate' => 50.50])->getPixelate());
+        static::assertNull($this->manipulator->setParams(['pixelate' => null])->getPixelate());
+        static::assertNull($this->manipulator->setParams(['pixelate' => 'a'])->getPixelate());
+        static::assertNull($this->manipulator->setParams(['pixelate' => '-1'])->getPixelate());
+        static::assertNull($this->manipulator->setParams(['pixelate' => '1001'])->getPixelate());
     }
 }

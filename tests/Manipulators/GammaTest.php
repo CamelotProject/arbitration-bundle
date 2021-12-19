@@ -40,18 +40,18 @@ final class GammaTest extends TestCase
             $mock->shouldReceive('gamma')->with('1.5')->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['gam' => '1.5'])->run($image));
+        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['gamma' => '1.5'])->run($image));
     }
 
     public function testGetGamma(): void
     {
-        static::assertSame(1.5, $this->manipulator->setParams(['gam' => '1.5'])->getGamma());
-        static::assertSame(1.5, $this->manipulator->setParams(['gam' => 1.5])->getGamma());
-        static::assertNull($this->manipulator->setParams(['gam' => null])->getGamma());
-        static::assertNull($this->manipulator->setParams(['gam' => 'a'])->getGamma());
-        static::assertNull($this->manipulator->setParams(['gam' => '.1'])->getGamma());
-        static::assertNull($this->manipulator->setParams(['gam' => '9.999'])->getGamma());
-        static::assertNull($this->manipulator->setParams(['gam' => '0.005'])->getGamma());
-        static::assertNull($this->manipulator->setParams(['gam' => '-1'])->getGamma());
+        static::assertSame(1.5, $this->manipulator->setParams(['gamma' => '1.5'])->getGamma());
+        static::assertSame(1.5, $this->manipulator->setParams(['gamma' => 1.5])->getGamma());
+        static::assertNull($this->manipulator->setParams(['gamma' => null])->getGamma());
+        static::assertNull($this->manipulator->setParams(['gamma' => 'a'])->getGamma());
+        static::assertNull($this->manipulator->setParams(['gamma' => '.1'])->getGamma());
+        static::assertNull($this->manipulator->setParams(['gamma' => '9.999'])->getGamma());
+        static::assertNull($this->manipulator->setParams(['gamma' => '0.005'])->getGamma());
+        static::assertNull($this->manipulator->setParams(['gamma' => '-1'])->getGamma());
     }
 }

@@ -40,16 +40,16 @@ final class ContrastTest extends TestCase
             $mock->shouldReceive('contrast')->with('50')->once();
         });
 
-        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['con' => 50])->run($image));
+        static::assertInstanceOf(Image::class, $this->manipulator->setParams(['contrast' => 50])->run($image));
     }
 
     public function testGetPixelate(): void
     {
-        static::assertSame(50, $this->manipulator->setParams(['con' => '50'])->getContrast());
-        static::assertSame(50, $this->manipulator->setParams(['con' => 50])->getContrast());
-        static::assertNull($this->manipulator->setParams(['con' => null])->getContrast());
-        static::assertNull($this->manipulator->setParams(['con' => '101'])->getContrast());
-        static::assertNull($this->manipulator->setParams(['con' => '-101'])->getContrast());
-        static::assertNull($this->manipulator->setParams(['con' => 'a'])->getContrast());
+        static::assertSame(50, $this->manipulator->setParams(['contrast' => '50'])->getContrast());
+        static::assertSame(50, $this->manipulator->setParams(['contrast' => 50])->getContrast());
+        static::assertNull($this->manipulator->setParams(['contrast' => null])->getContrast());
+        static::assertNull($this->manipulator->setParams(['contrast' => '101'])->getContrast());
+        static::assertNull($this->manipulator->setParams(['contrast' => '-101'])->getContrast());
+        static::assertNull($this->manipulator->setParams(['contrast' => 'a'])->getContrast());
     }
 }
