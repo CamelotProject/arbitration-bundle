@@ -2,9 +2,10 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Camelot\Arbitration\Manipulators;
 use Camelot\Arbitration\Api\Intervene;
 use Camelot\Arbitration\Api\InterveneInterface;
+use Camelot\Arbitration\Configuration\Renditions;
+use Camelot\Arbitration\Manipulators;
 use Intervention\Image\ImageManager;
 
 return function(ContainerConfigurator $configurator) {
@@ -64,4 +65,6 @@ return function(ContainerConfigurator $configurator) {
     ;
 
     $services->alias(InterveneInterface::class, Intervene::class);
+
+    $services->set(Renditions::class);
 };

@@ -10,8 +10,8 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Camelot\Intervention\Manipulators\BaseManipulator
- * @covers \Camelot\Intervention\Manipulators\Brightness
+ * @covers \Camelot\Arbitration\Manipulators\BaseManipulator
+ * @covers \Camelot\Arbitration\Manipulators\Brightness
  *
  * @internal
  */

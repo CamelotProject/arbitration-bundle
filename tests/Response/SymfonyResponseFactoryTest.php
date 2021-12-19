@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Camelot\Intervention\Tests\Response;
+namespace Camelot\Arbitration\Tests\Response;
 
-use Camelot\Intervention\Response\SymfonyResponseFactory;
+use Camelot\Arbitration\Response\SymfonyResponseFactory;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
- * @covers \Camelot\Intervention\Response\SymfonyResponseFactory
+ * @covers \Camelot\Arbitration\Response\SymfonyResponseFactory
  */
 final class SymfonyResponseFactoryTest extends TestCase
 {

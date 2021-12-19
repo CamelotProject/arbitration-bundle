@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Camelot\Intervention\Response;
+namespace Camelot\Arbitration\Response;
 
 use League\Flysystem\FilesystemOperator;
 use Symfony\Component\HttpFoundation\Request;
