@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Camelot\Arbitration\DependencyInjection;
 
 use Camelot\Arbitration\Configuration\Renditions;
+use Camelot\Arbitration\Responder\ResponderInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use function dirname;
+use function is_a;
 
 final class CamelotArbitrationExtension extends Extension
 {
@@ -25,5 +27,17 @@ final class CamelotArbitrationExtension extends Extension
             ->setArgument('$renditions', $config['renditions'])
             ->setArgument('$sets', $config['sets'])
         ;
+
+        $container->getDefinition('camelot.intervention.filesystem.images')
+            ->setArgument('$basePath', $config['image_path'])
+        ;
+
+        $container->getDefinition('camelot.intervention.filesystem.render')
+            ->setArgument('$basePath', $config['render_path'])
+        ;
+
+        if (is_a($config['responder'], ResponderInterface::class, true)) {
+            $container->setAlias(ResponderInterface::class, $config['responder']);
+        }
     }
 }
