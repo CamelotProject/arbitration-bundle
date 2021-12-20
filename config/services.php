@@ -10,6 +10,13 @@ use Camelot\Arbitration\Filesystem\Finder;
 use Camelot\Arbitration\Generator\PathnameGenerator;
 use Camelot\Arbitration\Generator\PathnameGeneratorInterface;
 use Camelot\Arbitration\Manipulators;
+use Camelot\Arbitration\Responder\FilesystemResponder;
+use Camelot\Arbitration\Responder\Psr16Responder;
+use Camelot\Arbitration\Responder\Psr6Responder;
+use Camelot\Arbitration\Responder\Responder;
+use Camelot\Arbitration\Responder\ResponderInterface;
+use Camelot\Arbitration\ResponseFactory\ResponseFactoryInterface;
+use Camelot\Arbitration\ResponseFactory\SymfonyResponseFactory;
 use Intervention\Image\ImageManager;
 
 return function(ContainerConfigurator $configurator) {
@@ -84,4 +91,20 @@ return function(ContainerConfigurator $configurator) {
     $services->set(PathnameGenerator::class);
 
     $services->alias(PathnameGeneratorInterface::class, PathnameGenerator::class);
+
+    $services->set(Responder::class);
+
+    $services->set(FilesystemResponder::class);
+
+    $services->set(Psr6Responder::class);
+
+    $services->set(Psr16Responder::class);
+
+    $services->alias(ResponderInterface::class, FilesystemResponder::class);
+
+    $services->set(SymfonyResponseFactory::class)
+        ->arg('$maxAge', 31536000)
+    ;
+
+    $services->alias(ResponseFactoryInterface::class, SymfonyResponseFactory::class);
 };
