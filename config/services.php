@@ -5,6 +5,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Camelot\Arbitration\Api\Intervene;
 use Camelot\Arbitration\Api\InterveneInterface;
 use Camelot\Arbitration\Configuration\Renditions;
+use Camelot\Arbitration\Controller\SymfonyImageController;
 use Camelot\Arbitration\Filesystem\Filesystem;
 use Camelot\Arbitration\Filesystem\Finder;
 use Camelot\Arbitration\Generator\PathnameGenerator;
@@ -107,4 +108,8 @@ return function(ContainerConfigurator $configurator) {
     ;
 
     $services->alias(ResponseFactoryInterface::class, SymfonyResponseFactory::class);
+
+    $services->set(SymfonyImageController::class)
+        ->tag('controller.service_arguments')
+    ;
 };
