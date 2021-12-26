@@ -11,6 +11,7 @@ use Camelot\Arbitration\Filesystem\Finder;
 use Camelot\Arbitration\Generator\PathnameGenerator;
 use Camelot\Arbitration\Generator\PathnameGeneratorInterface;
 use Camelot\Arbitration\Manipulators;
+use Camelot\Arbitration\Message\ImageRenderHandler;
 use Camelot\Arbitration\Responder\FilesystemResponder;
 use Camelot\Arbitration\Responder\Psr16Responder;
 use Camelot\Arbitration\Responder\Psr6Responder;
@@ -112,4 +113,6 @@ return function(ContainerConfigurator $configurator) {
     $services->set(SymfonyImageController::class)
         ->tag('controller.service_arguments')
     ;
+
+    $services->set(ImageRenderHandler::class);
 };
