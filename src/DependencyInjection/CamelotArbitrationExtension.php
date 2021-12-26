@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Camelot\Arbitration\DependencyInjection;
 
 use Camelot\Arbitration\Configuration\Renditions;
+use Camelot\Arbitration\Generator\SourceGenerator;
+use Camelot\Arbitration\Generator\SourceSetGenerator;
 use Camelot\Arbitration\Responder\ResponderInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
@@ -34,6 +36,16 @@ final class CamelotArbitrationExtension extends Extension
 
         $container->getDefinition('camelot.intervention.filesystem.render')
             ->setArgument('$basePath', $config['render_path'])
+        ;
+
+        $container->getDefinition(SourceGenerator::class)
+            ->setArgument('$imagesPath', $config['image_path'])
+            ->setArgument('$renderPath', $config['render_path'])
+        ;
+
+        $container->getDefinition(SourceSetGenerator::class)
+            ->setArgument('$imagesPath', $config['image_path'])
+            ->setArgument('$renderPath', $config['render_path'])
         ;
 
         if (is_a($config['responder'], ResponderInterface::class, true)) {
