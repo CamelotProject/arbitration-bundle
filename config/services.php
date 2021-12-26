@@ -10,6 +10,9 @@ use Camelot\Arbitration\Filesystem\Filesystem;
 use Camelot\Arbitration\Filesystem\Finder;
 use Camelot\Arbitration\Generator\PathnameGenerator;
 use Camelot\Arbitration\Generator\PathnameGeneratorInterface;
+use Camelot\Arbitration\Generator\SizesMediaQueryGenerator;
+use Camelot\Arbitration\Generator\SourceGenerator;
+use Camelot\Arbitration\Generator\SourceSetGenerator;
 use Camelot\Arbitration\Manipulators;
 use Camelot\Arbitration\Message\ImageRenderHandler;
 use Camelot\Arbitration\Responder\FilesystemResponder;
@@ -19,6 +22,7 @@ use Camelot\Arbitration\Responder\Responder;
 use Camelot\Arbitration\Responder\ResponderInterface;
 use Camelot\Arbitration\ResponseFactory\ResponseFactoryInterface;
 use Camelot\Arbitration\ResponseFactory\SymfonyResponseFactory;
+use Camelot\Arbitration\Twig\ArbitrationExtension;
 use Intervention\Image\ImageManager;
 
 return function(ContainerConfigurator $configurator) {
@@ -94,6 +98,12 @@ return function(ContainerConfigurator $configurator) {
 
     $services->alias(PathnameGeneratorInterface::class, PathnameGenerator::class);
 
+    $services->set(SourceGenerator::class);
+
+    $services->set(SourceSetGenerator::class);
+
+    $services->set(SizesMediaQueryGenerator::class);
+
     $services->set(Responder::class);
 
     $services->set(FilesystemResponder::class);
@@ -115,4 +125,6 @@ return function(ContainerConfigurator $configurator) {
     ;
 
     $services->set(ImageRenderHandler::class);
+
+    $services->set(ArbitrationExtension::class);
 };
