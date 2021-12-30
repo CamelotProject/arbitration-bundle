@@ -35,17 +35,9 @@ final class SizeTest extends TestCase
         static::assertInstanceOf(Size::class, new Size());
     }
 
-    public function testSetMaxImageSize(): void
+    public function testGetMaxSize(): void
     {
-        $manipulator = new Size();
-        $manipulator->setMaxImageSize(500 * 500);
-
-        static::assertSame(500 * 500, $manipulator->getMaxImageSize());
-    }
-
-    public function testGetMaxImageSize(): void
-    {
-        static::assertNull((new Size())->getMaxImageSize());
+        static::assertSame(42, (new Size())->setParams(['max_size' => 42])->getMaxSize());
     }
 
     public function testRun(): void
@@ -189,8 +181,8 @@ final class SizeTest extends TestCase
     /** @dataProvider providerLimitSize */
     public function testLimitImageSize(?array $expected, ?int $maxImageSize, ?int $width, ?int $height): void
     {
-        $size = new Size();
-        $size->setMaxImageSize($maxImageSize);
+        $size = (new Size())->setParams(['max_size' => $maxImageSize]);
+
         static::assertSame($expected, $size->limitImageSize($width, $height));
     }
 

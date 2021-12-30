@@ -16,40 +16,22 @@ use function is_numeric;
  * @property null|string $fit
  * @property string      $height
  * @property string      $width
+ * @property string      $max_size
  */
 class Size extends BaseManipulator
 {
-    /** Maximum image size in pixels. */
-    protected ?int $maxImageSize;
-
-    /**
-     * Create Size instance.
-     *
-     * @param null|int $maxImageSize maximum image size in pixels
-     */
-    public function __construct(int $maxImageSize = null)
-    {
-        $this->maxImageSize = $maxImageSize;
-    }
-
-    /**
-     * Set the maximum image size.
-     *
-     * @param null|int maximum image size in pixels
-     */
-    public function setMaxImageSize(mixed $maxImageSize): void
-    {
-        $this->maxImageSize = $maxImageSize;
-    }
-
     /**
      * Get the maximum image size.
      *
      * @return null|int maximum image size in pixels
      */
-    public function getMaxImageSize(): ?int
+    public function getMaxSize(): ?int
     {
-        return $this->maxImageSize;
+        if (!is_numeric($this->max_size)) {
+            return null;
+        }
+
+        return (int) $this->max_size;
     }
 
     /**
@@ -213,12 +195,13 @@ class Size extends BaseManipulator
      */
     public function limitImageSize(int $width, int $height): array
     {
-        if ($this->maxImageSize !== null) {
+        $maxImageSize = $this->getMaxSize();
+        if ($maxImageSize !== null) {
             $imageSize = $width * $height;
 
-            if ($imageSize > $this->maxImageSize) {
-                $width = $width / sqrt($imageSize / $this->maxImageSize);
-                $height = $height / sqrt($imageSize / $this->maxImageSize);
+            if ($imageSize > $maxImageSize) {
+                $width = $width / sqrt($imageSize / $maxImageSize);
+                $height = $height / sqrt($imageSize / $maxImageSize);
             }
         }
 
