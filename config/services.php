@@ -4,10 +4,14 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Camelot\Arbitration\Api\Intervene;
 use Camelot\Arbitration\Api\InterveneInterface;
+use Camelot\Arbitration\Command\ExpireCommand;
+use Camelot\Arbitration\Command\PrimeCommand;
+use Camelot\Arbitration\Command\VerifyCommand;
 use Camelot\Arbitration\Configuration\Renditions;
 use Camelot\Arbitration\Controller\SymfonyImageController;
 use Camelot\Arbitration\Filesystem\Filesystem;
 use Camelot\Arbitration\Filesystem\Finder;
+use Camelot\Arbitration\Filesystem\Supervisor;
 use Camelot\Arbitration\Generator\PathnameGenerator;
 use Camelot\Arbitration\Generator\PathnameGeneratorInterface;
 use Camelot\Arbitration\Generator\SizesMediaQueryGenerator;
@@ -30,6 +34,7 @@ return function(ContainerConfigurator $configurator) {
         ->defaults()
         ->autowire()
         ->autoconfigure()
+        ->bind('$projectDir', '%kernel.project_dir%')
         ->bind('$imagesFilesystem', service('camelot.intervention.filesystem.images'))
         ->bind('$renderFilesystem', service('camelot.intervention.filesystem.render'))
     ;
@@ -92,6 +97,8 @@ return function(ContainerConfigurator $configurator) {
 
     $services->set('camelot.intervention.filesystem.render', Filesystem::class);
 
+    $services->set(Supervisor::class);
+
     $services->set(Finder::class);
 
     $services->set(PathnameGenerator::class);
@@ -127,4 +134,16 @@ return function(ContainerConfigurator $configurator) {
     $services->set(ImageRenderHandler::class);
 
     $services->set(ArbitrationExtension::class);
+
+    $services->set(ExpireCommand::class)
+        ->tag('console.command')
+    ;
+
+    $services->set(PrimeCommand::class)
+        ->tag('console.command')
+    ;
+
+    $services->set(VerifyCommand::class)
+        ->tag('console.command')
+    ;
 };
